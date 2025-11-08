@@ -34,19 +34,35 @@ export default function HomePage() {
   // Calculate metrics for KPIs
   const currentMonth = rows[0] ?? null;
   const lastMonth = rows.length > 1 ? rows[rows.length - 2] : rows[0] ?? null;
-  const currentArr = currentMonth ? currentMonth.closingArr : 0;
-  const lastMonthArr = lastMonth ? lastMonth.closingArr : 0;
-  const arrChange =
-    lastMonthArr > 0 ? ((currentArr - lastMonthArr) / lastMonthArr) * 100 : 0;
+  
+  // Revenue (MRR)
+  const revenue = currentMonth ? currentMonth.revenue : 0;
+  const lastMonthRevenue = lastMonth ? lastMonth.revenue : 0;
+  const revenueChange =
+    lastMonthRevenue > 0 ? ((revenue - lastMonthRevenue) / lastMonthRevenue) * 100 : 0;
 
-  const currentSubscriptions = Math.round(currentArr / a.acvUsd);
-  const lastMonthSubscriptions = Math.round(lastMonthArr / a.acvUsd);
-  const subscriptionsChange =
-    lastMonthSubscriptions > 0
-      ? ((currentSubscriptions - lastMonthSubscriptions) /
-          lastMonthSubscriptions) *
-        100
+  // Cost of Sales (typically includes direct costs related to revenue generation)
+  // For SaaS, this is often minimal, but can include payment processing, hosting costs, etc.
+  // Using a percentage of revenue as a proxy (typically 5-10% for SaaS)
+  const costOfSales = revenue * 0.05; // 5% of revenue
+
+  // Gross Margin = Revenue - Cost of Sales
+  const grossMargin = revenue - costOfSales;
+  const grossMarginPercent = revenue > 0 ? (grossMargin / revenue) * 100 : 0;
+
+  // Operating Cost = Payroll + Opex
+  const operatingCost = (currentMonth ? currentMonth.payroll : 0) + (currentMonth ? currentMonth.opex : 0);
+  const lastMonthOperatingCost = (lastMonth ? lastMonth.payroll : 0) + (lastMonth ? lastMonth.opex : 0);
+  const operatingCostChange =
+    lastMonthOperatingCost > 0
+      ? ((operatingCost - lastMonthOperatingCost) / lastMonthOperatingCost) * 100
       : 0;
+
+  // EBITDA = Revenue - Cost of Sales - Operating Cost
+  const ebitda = revenue - costOfSales - operatingCost;
+  const lastMonthEbitda = lastMonthRevenue - (lastMonthRevenue * 0.05) - lastMonthOperatingCost;
+  const ebitdaChange =
+    lastMonthEbitda !== 0 ? ((ebitda - lastMonthEbitda) / Math.abs(lastMonthEbitda)) * 100 : 0;
 
   // Chart data - using last 12 months or available data
   const chartData = rows.slice(-12).map((r) => ({
@@ -61,51 +77,48 @@ export default function HomePage() {
     NewBilling: Math.round(r.newArr / 12),
   }));
 
-  // Revenue this month
-  const revenueThisMonth = currentMonth ? currentMonth.revenue : 0;
-  const collectionsThisMonth = currentMonth ? currentMonth.collections : 0;
-  
-  // Calculate unpaid invoices (placeholder - using burn as proxy)
-  const unpaidInvoices = Math.round((revenueThisMonth - collectionsThisMonth) / 1000);
-  const unpaidAmount = revenueThisMonth - collectionsThisMonth;
-
-  // Total collections for Net Payments
-  const totalCollections = rows.reduce((sum, r) => sum + r.collections, 0);
-
   return (
     <main className="flex-1 p-6 md:p-10 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* KPI Cards - 5 cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <KpiCard
-            title="Total MRR"
-            primaryValue={$$(revenueThisMonth)}
-            secondaryValue={`Total ARR ${$$(currentArr)}`}
+            title="Revenue"
+            primaryValue={$$(revenue)}
             change={{
-              value: `${arrChange.toFixed(2)}%`,
-              isPositive: arrChange >= 0,
+              value: `${revenueChange.toFixed(2)}%`,
+              isPositive: revenueChange >= 0,
             }}
           />
           <KpiCard
-            title="Total Active Subscriptions"
-            primaryValue={formatNumber(currentSubscriptions)}
+            title="Cost of Sales"
+            primaryValue={$$(costOfSales)}
+            secondaryValue={`${((costOfSales / revenue) * 100).toFixed(1)}% of revenue`}
+          />
+          <KpiCard
+            title="Gross Margin"
+            primaryValue={$$(grossMargin)}
+            secondaryValue={`${grossMarginPercent.toFixed(1)}% margin`}
             change={{
-              value: `${subscriptionsChange.toFixed(2)}%`,
-              isPositive: subscriptionsChange >= 0,
+              value: `${grossMarginPercent.toFixed(1)}%`,
+              isPositive: grossMarginPercent >= 0,
             }}
           />
           <KpiCard
-            title="Net Billing"
-            primaryValue={$$(summary.arrEnd)}
+            title="Operating Cost"
+            primaryValue={$$(operatingCost)}
+            change={{
+              value: `${operatingCostChange.toFixed(2)}%`,
+              isPositive: operatingCostChange <= 0,
+            }}
           />
           <KpiCard
-            title="Net Payments"
-            primaryValue={$$(totalCollections)}
-          />
-          <KpiCard
-            title="Unpaid Invoices"
-            primaryValue={formatNumber(Math.max(0, unpaidInvoices))}
-            secondaryValue={$$(Math.max(0, unpaidAmount))}
+            title="EBITDA"
+            primaryValue={$$(ebitda)}
+            change={{
+              value: `${ebitdaChange.toFixed(2)}%`,
+              isPositive: ebitdaChange >= 0,
+            }}
           />
         </div>
 
@@ -113,8 +126,8 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ChartCard
             title="Total Billing"
-            primaryValue={$$(revenueThisMonth)}
-            secondaryValue={`Previous: ${$$(lastMonth ? lastMonth.revenue : revenueThisMonth)}`}
+            primaryValue={$$(revenue)}
+            secondaryValue={`Previous: ${$$(lastMonth ? lastMonth.revenue : revenue)}`}
           >
             <div className="h-80 mt-4">
               <ResponsiveContainer width="100%" height="100%">
