@@ -503,61 +503,67 @@ export default function BusinessDashboardPage() {
         </div>
 
         {/* Monthly Forecast Table */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">
             Monthly Forecast (First 12 Months)
           </h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <table className="min-w-full">
+              <thead>
+                <tr className="border-b-2 border-gray-200">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Month
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ARR
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     MRR
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Customers
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Collections
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Spend
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Cash
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {rows.slice(0, 12).map((row) => {
+              <tbody className="divide-y divide-gray-100">
+                {rows.slice(0, 12).map((row, index) => {
                   const customers = Math.round(row.closingArr / a.acvUsd);
+                  const isEven = index % 2 === 0;
                   return (
-                    <tr key={row.m} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr
+                      key={row.m}
+                      className={`transition-colors ${
+                        isEven ? "bg-white" : "bg-gray-50/50"
+                      } hover:bg-blue-50/50`}
+                    >
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         Month {row.m}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
                         {$$(row.closingArr)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
                         {$$(row.revenue)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                         {formatNumber(customers)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-green-600">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
                         {$$(row.collections)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-red-600">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600 text-right font-medium">
                         {$$(row.payroll + row.opex)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">
                         {$$(row.cashEnd)}
                       </td>
                     </tr>
