@@ -145,17 +145,17 @@ function Table({ rows }: { rows: MonthRow[] }) {
           {rows.map((r) => (
             <tr key={r.m} className="border-t">
               <Td>{r.m}</Td>
-              <Td>{$$(r.openingArr)}</Td>
-              <Td>{$$(r.newArr)}</Td>
-              <Td>-{$$(r.churnArr)}</Td>
-              <Td>{$$(r.upsellArr)}</Td>
-              <Td className="font-medium">{$$(r.closingArr)}</Td>
-              <Td>{$$(r.revenue)}</Td>
-              <Td>{$$(r.collections)}</Td>
-              <Td>{$$(r.payroll)}</Td>
-              <Td>{$$(r.opex)}</Td>
-              <Td>{$$(r.burn)}</Td>
-              <Td className="font-medium">{$$(r.cashEnd)}</Td>
+              <Td className="tabular-nums">{$$(r.openingArr)}</Td>
+              <Td className="tabular-nums">{$$(r.newArr)}</Td>
+              <Td className="tabular-nums">-{$$(r.churnArr)}</Td>
+              <Td className="tabular-nums">{$$(r.upsellArr)}</Td>
+              <Td className="font-medium tabular-nums">{$$(r.closingArr)}</Td>
+              <Td className="tabular-nums">{$$(r.revenue)}</Td>
+              <Td className="tabular-nums">{$$(r.collections)}</Td>
+              <Td className="tabular-nums">{$$(r.payroll)}</Td>
+              <Td className="tabular-nums">{$$(r.opex)}</Td>
+              <Td className="tabular-nums">{$$(r.burn)}</Td>
+              <Td className="font-medium tabular-nums">{$$(r.cashEnd)}</Td>
             </tr>
           ))}
         </tbody>

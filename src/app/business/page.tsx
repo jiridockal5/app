@@ -549,22 +549,22 @@ export default function BusinessDashboardPage() {
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         Month {row.m}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium tabular-nums">
                         {$$(row.closingArr)}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium tabular-nums">
                         {$$(row.revenue)}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right tabular-nums">
                         {formatNumber(customers)}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium tabular-nums">
                         {$$(row.collections)}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600 text-right font-medium">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600 text-right font-medium tabular-nums">
                         {$$(row.payroll + row.opex)}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right tabular-nums">
                         {$$(row.cashEnd)}
                       </td>
                     </tr>
