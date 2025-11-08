@@ -4,16 +4,6 @@ import { useMemo } from "react";
 import { useAppStore } from "@/state/store";
 import { buildPlan } from "@/lib/calc/plan";
 import { KpiCard } from "@/components/dashboard/KpiCard";
-import { ChartCard } from "@/components/dashboard/ChartCard";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 
 const $$ = (n: number) =>
   n.toLocaleString("en-US", {
@@ -106,19 +96,6 @@ export default function HomePage() {
   // Operating Margin %: EBIT / Revenue
   // In our model, EBIT ≈ EBITDA (no separate interest/tax/depreciation)
   const operatingMargin = revenue > 0 ? (ebitda / revenue) * 100 : 0;
-
-  // Chart data - using last 12 months or available data
-  const chartData = rows.slice(-12).map((r) => ({
-    month: `M${r.m}`,
-    date: `Nov ${r.m}`,
-    ARR: Math.round(r.closingArr),
-    Revenue: Math.round(r.revenue),
-    Collections: Math.round(r.collections),
-    Spend: Math.round(r.payroll + r.opex),
-    Cash: Math.round(r.cashEnd),
-    Billing: Math.round(r.revenue),
-    NewBilling: Math.round(r.newArr / 12),
-  }));
 
   return (
     <main className="flex-1 p-6 md:p-10 bg-gray-50">
@@ -254,155 +231,6 @@ export default function HomePage() {
             }}
             tooltip="Operating Margin %\nOperating profitability: EBIT / Revenue\nBenchmark: Positive = profitable | Negative = burning cash | Tracks path to breakeven"
           />
-        </div>
-
-        {/* Charts - 2 cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ChartCard
-            title="Total Billing"
-            primaryValue={$$(revenue)}
-            secondaryValue={`Previous: ${$$(lastMonth ? lastMonth.revenue : revenue)}`}
-          >
-            <div className="h-80 mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
-                  <defs>
-                    <linearGradient id="colorBilling" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke="#e5e7eb" 
-                    vertical={false}
-                    strokeWidth={1}
-                  />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke="#6b7280"
-                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
-                    tickLine={{ stroke: "#d1d5db" }}
-                    axisLine={{ stroke: "#d1d5db" }}
-                  />
-                  <YAxis 
-                    stroke="#6b7280"
-                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
-                    tickLine={{ stroke: "#d1d5db" }}
-                    axisLine={{ stroke: "#d1d5db" }}
-                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                    width={60}
-                  />
-                  <Tooltip
-                    formatter={(value: number) => [
-                      $$(value),
-                      "Billing"
-                    ]}
-                    labelFormatter={(label) => `Month ${label}`}
-                    contentStyle={{
-                      backgroundColor: "white",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "8px",
-                      padding: "12px",
-                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                    }}
-                    labelStyle={{
-                      fontWeight: 600,
-                      color: "#111827",
-                      marginBottom: "4px",
-                    }}
-                    itemStyle={{
-                      color: "#3b82f6",
-                      fontWeight: 500,
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="Billing"
-                    stroke="#3b82f6"
-                    strokeWidth={3}
-                    fillOpacity={1}
-                    fill="url(#colorBilling)"
-                    dot={false}
-                    activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "white" }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </ChartCard>
-
-          <ChartCard
-            title="Total New Billing"
-            primaryValue={$$((currentMonth?.newArr ?? 0) / 12)}
-            secondaryValue={`Previous: ${$$((lastMonth?.newArr ?? 0) / 12)}`}
-          >
-            <div className="h-80 mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
-                  <defs>
-                    <linearGradient id="colorNewBilling" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke="#e5e7eb" 
-                    vertical={false}
-                    strokeWidth={1}
-                  />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke="#6b7280"
-                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
-                    tickLine={{ stroke: "#d1d5db" }}
-                    axisLine={{ stroke: "#d1d5db" }}
-                  />
-                  <YAxis 
-                    stroke="#6b7280"
-                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
-                    tickLine={{ stroke: "#d1d5db" }}
-                    axisLine={{ stroke: "#d1d5db" }}
-                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                    width={60}
-                  />
-                  <Tooltip
-                    formatter={(value: number) => [
-                      $$(value),
-                      "New Billing"
-                    ]}
-                    labelFormatter={(label) => `Month ${label}`}
-                    contentStyle={{
-                      backgroundColor: "white",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "8px",
-                      padding: "12px",
-                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                    }}
-                    labelStyle={{
-                      fontWeight: 600,
-                      color: "#111827",
-                      marginBottom: "4px",
-                    }}
-                    itemStyle={{
-                      color: "#10b981",
-                      fontWeight: 500,
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="NewBilling"
-                    stroke="#10b981"
-                    strokeWidth={3}
-                    fillOpacity={1}
-                    fill="url(#colorNewBilling)"
-                    dot={false}
-                    activeDot={{ r: 6, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </ChartCard>
         </div>
       </div>
     </main>
