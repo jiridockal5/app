@@ -1,100 +1,72 @@
-/**
- * Plan orchestrator: builds complete plan from assumptions
- */
+import { Assumptions, MonthRow, PlanSummary } from "./types";
 
-import { Assumptions, MonthRow, PlanSummary } from "./drivers";
-import { calculateTopline } from "./topline";
-import { calculateCollections, calculateCash } from "./cash";
-import { calculateHeadcount, calculatePayroll } from "./people";
-import { calculateOpex } from "./spend";
-import { calculateKPIs } from "./kpis";
-
-/**
- * Build complete plan from assumptions
- */
-export function buildPlan(assumptions: Assumptions): {
+export function buildPlan(a: Assumptions): {
   rows: MonthRow[];
   summary: PlanSummary;
 } {
+  const N = a.horizonMonths;
   const rows: MonthRow[] = [];
-  let prevCash = assumptions.startCashUsd;
-  let prevRevenue = assumptions.startArrUsd / 12;
-  let prevClosingArr = assumptions.startArrUsd;
+  let openingArr = a.startArrUsd;
+  let prevRevenue = openingArr / 12;
+  let cash = a.startCashUsd;
 
-  for (let month = 1; month <= assumptions.horizonMonths; month++) {
-    // Topline
-    const topline = calculateTopline(assumptions, month, prevClosingArr);
+  for (let m = 1; m <= N; m++) {
+    const newArr = a.newLogosPerMonth * a.acvUsd;
+    const churnArr = openingArr * a.churnMonthly;
+    const upsellArr = openingArr * a.upsellMonthly;
+    const closingArr = Math.max(0, openingArr + newArr - churnArr + upsellArr);
 
-    // Collections
-    const collections = calculateCollections(
-      topline.revenue,
-      prevRevenue,
-      assumptions.collectSplit
-    );
+    const revenue = closingArr / 12;
+    const [c0, c1] = a.collectSplit;
+    const collections = revenue * c0 + prevRevenue * c1;
 
-    // People
-    const headcount = calculateHeadcount(
-      assumptions.headcountNow,
-      assumptions.hiresNext6Months,
-      month
-    );
-    const payroll = calculatePayroll(headcount, assumptions.avgCostPerFteUsd);
-
-    // Spend
-    const opex = calculateOpex(assumptions.spendMonthlyUsd);
-
-    // Investment
-    const investment =
-      month === assumptions.oneOffInvestmentMonth
-        ? assumptions.oneOffInvestmentAmountUsd || 0
-        : 0;
-
-    // Cash
-    const cashEnd = calculateCash(prevCash, collections, payroll, opex, investment);
-
-    // Burn
+    const payroll = a.payrollPerMonthUsd;
+    const opex = a.opexPerMonthUsd;
     const burn = payroll + opex - collections;
 
-    // Month row
+    if (
+      a.oneOffInvestmentMonth &&
+      a.oneOffInvestmentAmountUsd &&
+      m === a.oneOffInvestmentMonth
+    ) {
+      cash += a.oneOffInvestmentAmountUsd;
+    }
+    cash += collections - (payroll + opex);
+
     rows.push({
-      m: month,
-      openingArr: month === 1 ? assumptions.startArrUsd : prevClosingArr,
-      newArr: topline.newArr,
-      churnArr: topline.churnArr,
-      upsellArr: topline.upsellArr,
-      closingArr: topline.closingArr,
-      revenue: topline.revenue,
+      m,
+      openingArr,
+      newArr,
+      churnArr,
+      upsellArr,
+      closingArr,
+      revenue,
       collections,
       payroll,
       opex,
       burn,
-      cashEnd,
-      newLogos: topline.newLogos,
+      cashEnd: cash,
     });
 
-    // Update for next iteration
-    prevCash = cashEnd;
-    prevRevenue = topline.revenue;
-    prevClosingArr = topline.closingArr;
+    prevRevenue = revenue;
+    openingArr = closingArr;
   }
 
-  // Summary
-  const lastRow = rows[rows.length - 1];
-  const nextRow = rows.length > 1 ? rows[rows.length - 2] : lastRow;
-  const kpis = calculateKPIs(rows, assumptions);
+  const end = rows[rows.length - 1];
+  const revenueNext = rows[0]?.revenue ?? 0;
+  const burnNext = rows[0]?.burn ?? 0;
+  let runway: number | "∞" = "∞";
+  if (burnNext > 0)
+    runway = Math.max(1, Math.round(a.startCashUsd / burnNext));
 
-  const summary: PlanSummary = {
-    arrEnd: lastRow.closingArr,
-    revenueNext: nextRow.revenue,
-    burnNext: nextRow.burn,
-    cashEnd: lastRow.cashEnd,
-    runwayMonths: kpis.runwayMonths,
-    nrrPct: kpis.nrrPct,
-    ltv: kpis.ltv,
-    cac: kpis.cac,
-    ltvCac: kpis.ltvCac,
+  return {
+    rows,
+    summary: {
+      arrEnd: end?.closingArr ?? a.startArrUsd,
+      revenueNext,
+      burnNext,
+      cashEnd: end?.cashEnd ?? a.startCashUsd,
+      runwayMonths: runway,
+    },
   };
-
-  return { rows, summary };
 }
-

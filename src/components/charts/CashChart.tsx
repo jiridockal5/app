@@ -14,7 +14,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { MonthRow } from "@/lib/calc/drivers";
+import { MonthRow } from "@/lib/calc/types";
 
 interface CashChartProps {
   rows: MonthRow[];

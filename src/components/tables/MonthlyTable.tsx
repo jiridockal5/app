@@ -2,7 +2,7 @@
  * Monthly table component
  */
 
-import { MonthRow } from "@/lib/calc/drivers";
+import { MonthRow } from "@/lib/calc/types";
 
 interface MonthlyTableProps {
   rows: MonthRow[];
@@ -25,9 +25,6 @@ export function MonthlyTable({ rows }: MonthlyTableProps) {
           <tr>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Month
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              New Logos
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Annual Revenue End
@@ -55,7 +52,6 @@ export function MonthlyTable({ rows }: MonthlyTableProps) {
               <td className="px-4 py-3 whitespace-nowrap font-medium">
                 {row.m}
               </td>
-              <td className="px-4 py-3 whitespace-nowrap">{row.newLogos}</td>
               <td className="px-4 py-3 whitespace-nowrap">
                 {formatCurrency(row.closingArr)}
               </td>
