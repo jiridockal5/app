@@ -132,13 +132,13 @@ export default function HomePage() {
               value: `${revenueChange.toFixed(2)}%`,
               isPositive: revenueChange >= 0,
             }}
-            tooltip="Monthly Recurring Revenue (MRR)\n\nMonthly revenue from active subscriptions.\n\nBenchmark: Positive growth indicates healthy business expansion."
+            tooltip="Monthly Recurring Revenue (MRR)\nMonthly revenue from active subscriptions.\nBenchmark: Positive growth indicates healthy business expansion."
           />
           <KpiCard
             title="Cost of Sales"
             primaryValue={$$(costOfSales)}
             secondaryValue={`${((costOfSales / revenue) * 100).toFixed(1)}% of revenue`}
-            tooltip="Cost of Sales (COGS)\n\nDirect costs to deliver service (payment processing, hosting, infrastructure).\n\nBenchmark: 5-10% of revenue is typical for SaaS. Lower is better."
+            tooltip="Cost of Sales (COGS)\nDirect costs to deliver service (payment processing, hosting, infrastructure).\nBenchmark: 5-10% of revenue is typical for SaaS. Lower is better."
           />
           <KpiCard
             title="Gross Margin"
@@ -148,7 +148,7 @@ export default function HomePage() {
               value: `${grossMarginPercent.toFixed(1)}%`,
               isPositive: grossMarginPercent >= 0,
             }}
-            tooltip="Gross Profit Margin\n\nRevenue minus Cost of Sales. Profitability before operating expenses.\n\nBenchmark: 75-90% is typical for SaaS. Below 70% indicates high infrastructure costs."
+            tooltip="Gross Profit Margin\nRevenue minus Cost of Sales. Profitability before operating expenses.\nBenchmark: 75-90% is typical for SaaS. Below 70% indicates high infrastructure costs."
           />
           <KpiCard
             title="Operating Cost"
@@ -157,7 +157,7 @@ export default function HomePage() {
               value: `${operatingCostChange.toFixed(2)}%`,
               isPositive: operatingCostChange <= 0,
             }}
-            tooltip="Operating Expenses\n\nTotal monthly costs: payroll + operational expenses (tools, ads, infrastructure).\n\nBenchmark: Monitor for efficiency. Lower relative to revenue indicates better unit economics."
+            tooltip="Operating Expenses\nTotal monthly costs: payroll + operational expenses (tools, ads, infrastructure).\nBenchmark: Monitor for efficiency. Lower relative to revenue indicates better unit economics."
           />
           <KpiCard
             title="EBITDA"
@@ -166,7 +166,7 @@ export default function HomePage() {
               value: `${ebitdaChange.toFixed(2)}%`,
               isPositive: ebitdaChange >= 0,
             }}
-            tooltip="EBITDA\n\nEarnings Before Interest, Taxes, Depreciation, and Amortization.\nFormula: Revenue - Cost of Sales - Operating Costs\n\nBenchmark: Positive = profitable. Negative = burning cash. Track path to profitability."
+            tooltip="EBITDA\nEarnings Before Interest, Taxes, Depreciation, and Amortization.\nFormula: Revenue - Cost of Sales - Operating Costs\nBenchmark: Positive = profitable. Negative = burning cash. Track path to profitability."
           />
         </div>
 
@@ -186,7 +186,7 @@ export default function HomePage() {
               value: magicNumber >= 1.0 ? "Excellent" : magicNumber >= 0.7 ? "Good" : "Low",
               isPositive: magicNumber >= 0.7,
             }}
-            tooltip="Magic Number\n\nSales efficiency metric: (ΔARR × 4) / S&M spend (previous quarter)\n\nBenchmark: 0.7-1.0+ = healthy | >1.0 = excellent | <0.5 = needs improvement"
+            tooltip="Magic Number\nSales efficiency metric: (ΔARR × 4) / S&M spend (previous quarter)\nBenchmark: 0.7-1.0+ = healthy | >1.0 = excellent | <0.5 = needs improvement"
           />
           <KpiCard
             title="Burn Multiple"
@@ -211,7 +211,7 @@ export default function HomePage() {
                   : "Poor",
               isPositive: burnMultiple < 2 && burnMultiple !== Infinity,
             }}
-            tooltip="Burn Multiple\n\nCash efficiency: Net Burn / Net New ARR\n\nBenchmark: <1 = excellent | 1-2 = good | >2 = poor | Lower is better"
+            tooltip="Burn Multiple\nCash efficiency: Net Burn / Net New ARR\nBenchmark: <1 = excellent | 1-2 = good | >2 = poor | Lower is better"
           />
           <KpiCard
             title="Rule of 40"
@@ -221,7 +221,7 @@ export default function HomePage() {
               value: ruleOf40 >= 40 ? "Healthy" : "Below target",
               isPositive: ruleOf40 >= 40,
             }}
-            tooltip="Rule of 40\n\nBalances growth and profitability: Growth % + EBITDA %\n\nBenchmark: ≥40% = healthy SaaS business | Trade off growth vs profitability"
+            tooltip="Rule of 40\nBalances growth and profitability: Growth % + EBITDA %\nBenchmark: ≥40% = healthy SaaS business | Trade off growth vs profitability"
           />
           <KpiCard
             title="Gross Margin %"
@@ -242,7 +242,7 @@ export default function HomePage() {
                   : "Low",
               isPositive: grossMarginPercent >= 70,
             }}
-            tooltip="Gross Margin %\n\nProfitability: (Revenue – COGS) / Revenue\n\nBenchmark: 75-90% = typical SaaS | <70% = infrastructure heavy"
+            tooltip="Gross Margin %\nProfitability: (Revenue – COGS) / Revenue\nBenchmark: 75-90% = typical SaaS | <70% = infrastructure heavy"
           />
           <KpiCard
             title="Operating Margin %"
@@ -252,7 +252,7 @@ export default function HomePage() {
               value: operatingMargin >= 0 ? "Positive" : "Negative",
               isPositive: operatingMargin >= 0,
             }}
-            tooltip="Operating Margin %\n\nOperating profitability: EBIT / Revenue\n\nBenchmark: Positive = profitable | Negative = burning cash | Tracks path to breakeven"
+            tooltip="Operating Margin %\nOperating profitability: EBIT / Revenue\nBenchmark: Positive = profitable | Negative = burning cash | Tracks path to breakeven"
           />
         </div>
 
