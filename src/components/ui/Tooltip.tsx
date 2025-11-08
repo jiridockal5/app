@@ -2,34 +2,40 @@
 
 import React, { useState } from "react";
 
-type Width = "sm" | "md" | "lg";
+type Width = "sm" | "md" | "lg" | "xl" | "xxl";
 
 type Props = {
   content: string | string[];
   className?: string;
-  width?: Width; // tooltip max width
+  width?: Width;
 };
 
 function normalizeBlocks(input: string | string[]) {
   const raw = Array.isArray(input) ? input.join("\n") : input;
   const text = raw.replace(/\\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
-  // Split to paragraphs by double newline, keep single newline as <br/>
   return text.split("\n\n").map((p) => p.split("\n"));
 }
 
+// Tailwind width presets (smaller to larger). We also add a viewport cap class.
 const WIDTH_MAP: Record<Width, string> = {
   sm: "max-w-56", // 14rem
   md: "max-w-80", // 20rem
   lg: "max-w-96", // 24rem
+  xl: "max-w-xl", // 36rem
+  xxl: "max-w-[48rem]", // 48rem (~2× your current bubble)
 };
+
+// Viewport cap so it never overflows horizontally:
+// max width = min(<chosen preset>, 100vw - 2rem)
+const VIEWPORT_CAP = "max-w-[min(100vw-2rem,48rem)]"; // works with arbitrary width
 
 /**
  * Tooltip with built-in "i" icon trigger:
  * - Always positions below the icon
  * - Visible on HOVER or KEYBOARD FOCUS of the trigger only
- * - Configurable width for better readability
+ * - Configurable width with viewport-safe maximum
  */
-export default function Tooltip({ content, className, width = "lg" }: Props) {
+export default function Tooltip({ content, className, width = "xxl" }: Props) {
   const id = React.useId();
   const [isVisible, setIsVisible] = useState(false);
   const blocks = normalizeBlocks(content);
@@ -55,9 +61,10 @@ export default function Tooltip({ content, className, width = "lg" }: Props) {
         role="tooltip"
         className={[
           "pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-2",
-          "rounded-xl bg-gray-900 px-5 py-4 text-sm leading-6 text-white shadow-xl",
+          "rounded-xl bg-gray-900 px-5 py-4 text-sm leading-6 text-white shadow-2xl",
           "transition-all duration-200 z-[9999]",
           WIDTH_MAP[width],
+          VIEWPORT_CAP,
           "break-words",
           isVisible ? "opacity-100 visible" : "opacity-0 invisible",
         ].join(" ")}
