@@ -10,7 +10,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { name: "Home", href: "/", icon: "🏠" },
+  { name: "Financial dashboard", href: "/", icon: "🏠" },
+  { name: "Business dashboard & SaaS", href: "/business", icon: "📈" },
   { name: "Revenue", href: "/revenue", icon: "💰" },
   { name: "Expenses", href: "/expenses", icon: "💸" },
   { name: "People", href: "/people", icon: "👥" },
