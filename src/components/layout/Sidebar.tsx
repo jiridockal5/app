@@ -64,9 +64,9 @@ export function Sidebar() {
 
   // Handle keyboard navigation in dropdown
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen || filteredItems.length === 0) return;
+    if (!isOpen || filteredItems.length === 0) return;
 
+    const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setSelectedIndex((prev) =>
@@ -88,10 +88,8 @@ export function Sidebar() {
       }
     };
 
-    if (isOpen) {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, filteredItems, selectedIndex, router]);
 
   // Reset selected index when search changes
@@ -101,6 +99,8 @@ export function Sidebar() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -113,10 +113,8 @@ export function Sidebar() {
       }
     };
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
   const handleItemClick = (href: string) => {

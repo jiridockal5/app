@@ -14,7 +14,7 @@ export function ChartCard({
   title,
   primaryValue,
   secondaryValue,
-  updated,
+  updated: _updated,
   children,
 }: ChartCardProps) {
   return (

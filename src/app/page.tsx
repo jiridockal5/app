@@ -13,14 +13,11 @@ const $$ = (n: number) =>
     minimumFractionDigits: 0,
   });
 
-const formatNumber = (n: number) =>
-  n.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-  });
+// formatNumber removed - not used
 
 export default function HomePage() {
   const a = useAppStore((s) => s.a);
-  const { rows, summary } = useMemo(() => buildPlan(a), [a]);
+  const { rows } = useMemo(() => buildPlan(a), [a]);
 
   // Calculate metrics for KPIs
   const currentMonth = rows[0] ?? null;

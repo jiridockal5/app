@@ -480,7 +480,7 @@ export default function BusinessDashboardPage() {
                   <Legend 
                     wrapperStyle={{ paddingTop: "20px" }}
                     iconType="rect"
-                    formatter={(value) => (
+                    formatter={(_value) => (
                       <span style={{ color: "#374151", fontSize: "13px", fontWeight: 500 }}>
                         → Customers
                       </span>

@@ -21,10 +21,7 @@ const $$ = (n: number) =>
     minimumFractionDigits: 0,
   });
 
-const formatNumber = (n: number) =>
-  n.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-  });
+// formatNumber removed - not used
 
 type RevenueChannel = {
   enabled: boolean;
