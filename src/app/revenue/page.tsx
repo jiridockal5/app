@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useAppStore } from "@/state/store";
 import {
   LineChart,
   Line,
@@ -66,10 +67,24 @@ type ForecastRow = {
 };
 
 export default function RevenueForecastPage() {
+  const a = useAppStore((s) => s.a);
+  const setAssumptions = useAppStore((s) => s.set);
+  
+  // Get starting MRR from store (convert ARR to MRR)
+  const startingMRRFromStore = a.startArrUsd / 12;
+  
   const [settings, setSettings] = useState({
     months: 24,
-    starting_mrr: 10000,
+    starting_mrr: startingMRRFromStore,
   });
+
+  // Sync starting MRR with store when store changes
+  useEffect(() => {
+    const storeMRR = a.startArrUsd / 12;
+    if (Math.abs(storeMRR - settings.starting_mrr) > 0.01) {
+      setSettings((prev) => ({ ...prev, starting_mrr: storeMRR }));
+    }
+  }, [a.startArrUsd, settings.starting_mrr]);
 
   const [plg, setPlg] = useState<PlgChannel>({
     enabled: true,
@@ -235,8 +250,15 @@ export default function RevenueForecastPage() {
             <InputField
               label="Starting MRR"
               value={settings.starting_mrr}
-              onChange={(value) => setSettings({ ...settings, starting_mrr: value })}
+              onChange={(value) => {
+                setSettings({ ...settings, starting_mrr: value });
+                // Also update store ARR when MRR changes
+                setAssumptions({ startArrUsd: value * 12 });
+              }}
             />
+            <div className="text-xs text-gray-500 mt-2">
+              Current store ARR: {$$(a.startArrUsd)} (MRR: {$$(a.startArrUsd / 12)})
+            </div>
           </div>
         </div>
 
@@ -410,15 +432,6 @@ export default function RevenueForecastPage() {
                   activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "white" }}
                   name="MRR"
                 />
-                <Line
-                  type="monotone"
-                  dataKey="ARR"
-                  stroke="#10b981"
-                  strokeWidth={3}
-                  dot={{ fill: "#10b981", r: 4, strokeWidth: 2, stroke: "white" }}
-                  activeDot={{ r: 6, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
-                  name="ARR"
-                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -441,8 +454,19 @@ export default function RevenueForecastPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="text-sm text-gray-500 mb-2">Ending ARR</div>
             <div className="text-2xl font-bold text-green-600">
-              {$$(data[data.length - 1]?.ARR || 0)}
+              {$$((data[data.length - 1]?.endingMRR || 0) * 12)}
             </div>
+            <button
+              onClick={() => {
+                const endingARR = (data[data.length - 1]?.endingMRR || 0) * 12;
+                setAssumptions({ startArrUsd: endingARR });
+                // Update local starting MRR to match
+                setSettings((prev) => ({ ...prev, starting_mrr: endingARR / 12 }));
+              }}
+              className="text-xs text-blue-600 hover:text-blue-800 mt-2 underline"
+            >
+              Update store to this ARR
+            </button>
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="text-sm text-gray-500 mb-2">Total Growth</div>
@@ -471,7 +495,6 @@ export default function RevenueForecastPage() {
                     "Churn MRR",
                     "Net New MRR",
                     "Ending MRR",
-                    "ARR",
                   ].map((h) => (
                     <th
                       key={h}
@@ -510,9 +533,6 @@ export default function RevenueForecastPage() {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right tabular-nums">
                         {$$(row.endingMRR)}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm font-semibold text-green-600 text-right tabular-nums">
-                        {$$(row.ARR)}
                       </td>
                     </tr>
                   );
