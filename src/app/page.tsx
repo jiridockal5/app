@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import { useAppStore } from "@/state/store";
 import { buildPlan } from "@/lib/calc/plan";
 import { KpiCard } from "@/components/dashboard/KpiCard";
-import { SummaryCard } from "@/components/dashboard/SummaryCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import {
   AreaChart,
@@ -107,46 +106,6 @@ export default function HomePage() {
             title="Unpaid Invoices"
             primaryValue={formatNumber(Math.max(0, unpaidInvoices))}
             secondaryValue={$$(Math.max(0, unpaidAmount))}
-          />
-        </div>
-
-        {/* Summary Cards - 4 cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <SummaryCard
-            title="REVENUE THIS MONTH"
-            items={[
-              { label: "Expected", value: $$(revenueThisMonth) },
-              { label: "Received", value: $$(collectionsThisMonth) },
-              {
-                label: "Last month",
-                value: $$(lastMonth ? lastMonth.revenue : 0),
-              },
-            ]}
-          />
-          <SummaryCard
-            title="TODAY'S REVENUE"
-            items={[
-              { label: "Expected", value: $$(revenueThisMonth / 30) },
-              { label: "Received", value: $$(collectionsThisMonth / 30) },
-              { label: "Yesterday", value: $$(revenueThisMonth / 30) },
-            ]}
-          />
-          <SummaryCard
-            title="SIGNUPS THIS MONTH"
-            items={[
-              { label: "Total", value: formatNumber(a.newLogosPerMonth) },
-              {
-                label: "Last month",
-                value: formatNumber(a.newLogosPerMonth),
-              },
-            ]}
-          />
-          <SummaryCard
-            title="SIGNUPS TODAY"
-            items={[
-              { label: "Total", value: formatNumber(Math.round(a.newLogosPerMonth / 30)) },
-              { label: "Yesterday", value: "0" },
-            ]}
           />
         </div>
 

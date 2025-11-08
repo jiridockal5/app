@@ -334,30 +334,94 @@ export default function BusinessDashboardPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">
               ARR & MRR Growth
             </h2>
-            <div className="h-64">
+            <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value: number) => $$(value)} />
-                  <Legend />
+                <LineChart 
+                  data={chartData} 
+                  margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
+                >
+                  <defs>
+                    <linearGradient id="arrGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid 
+                    strokeDasharray="3 3" 
+                    stroke="#e5e7eb" 
+                    vertical={false}
+                    strokeWidth={1}
+                  />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="#6b7280"
+                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                    tickLine={{ stroke: "#d1d5db" }}
+                    axisLine={{ stroke: "#d1d5db" }}
+                  />
+                  <YAxis 
+                    stroke="#6b7280"
+                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                    tickLine={{ stroke: "#d1d5db" }}
+                    axisLine={{ stroke: "#d1d5db" }}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                    width={65}
+                  />
+                  <Tooltip
+                    formatter={(value: number, name: string) => [
+                      name === "ARR" || name === "MRR" ? $$(value) : formatNumber(value),
+                      name
+                    ]}
+                    labelFormatter={(label) => `Month ${label}`}
+                    contentStyle={{
+                      backgroundColor: "white",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "8px",
+                      padding: "12px",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    }}
+                    labelStyle={{
+                      fontWeight: 600,
+                      color: "#111827",
+                      marginBottom: "4px",
+                    }}
+                    itemStyle={{
+                      fontWeight: 500,
+                    }}
+                  />
+                  <Legend 
+                    wrapperStyle={{ paddingTop: "20px" }}
+                    iconType="line"
+                    formatter={(value) => (
+                      <span style={{ color: "#374151", fontSize: "13px", fontWeight: 500 }}>
+                        {value === "ARR" ? "→ ARR" : value === "MRR" ? "→ MRR" : value}
+                      </span>
+                    )}
+                  />
                   <Line
                     type="monotone"
                     dataKey="ARR"
                     stroke="#3b82f6"
-                    strokeWidth={2}
+                    strokeWidth={3}
+                    dot={{ fill: "#3b82f6", r: 4, strokeWidth: 2, stroke: "white" }}
+                    activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "white" }}
                     name="ARR"
                   />
                   <Line
                     type="monotone"
                     dataKey="MRR"
                     stroke="#10b981"
-                    strokeWidth={2}
+                    strokeWidth={3}
+                    dot={{ fill: "#10b981", r: 4, strokeWidth: 2, stroke: "white" }}
+                    activeDot={{ r: 6, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
                     name="MRR"
                   />
                 </LineChart>
@@ -365,24 +429,84 @@ export default function BusinessDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">
               Customer Growth
             </h2>
-            <div className="h-64">
+            <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value: number) => formatNumber(value)} />
-                  <Legend />
+                <AreaChart 
+                  data={chartData} 
+                  margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
+                >
+                  <defs>
+                    <linearGradient id="customerGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid 
+                    strokeDasharray="3 3" 
+                    stroke="#e5e7eb" 
+                    vertical={false}
+                    strokeWidth={1}
+                  />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="#6b7280"
+                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                    tickLine={{ stroke: "#d1d5db" }}
+                    axisLine={{ stroke: "#d1d5db" }}
+                  />
+                  <YAxis 
+                    stroke="#6b7280"
+                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                    tickLine={{ stroke: "#d1d5db" }}
+                    axisLine={{ stroke: "#d1d5db" }}
+                    tickFormatter={(value) => formatNumber(value)}
+                    width={60}
+                  />
+                  <Tooltip
+                    formatter={(value: number) => [
+                      formatNumber(value),
+                      "Customers"
+                    ]}
+                    labelFormatter={(label) => `Month ${label}`}
+                    contentStyle={{
+                      backgroundColor: "white",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "8px",
+                      padding: "12px",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    }}
+                    labelStyle={{
+                      fontWeight: 600,
+                      color: "#111827",
+                      marginBottom: "4px",
+                    }}
+                    itemStyle={{
+                      color: "#8b5cf6",
+                      fontWeight: 500,
+                    }}
+                  />
+                  <Legend 
+                    wrapperStyle={{ paddingTop: "20px" }}
+                    iconType="rect"
+                    formatter={(value) => (
+                      <span style={{ color: "#374151", fontSize: "13px", fontWeight: 500 }}>
+                        → Customers
+                      </span>
+                    )}
+                  />
                   <Area
                     type="monotone"
                     dataKey="Customers"
                     stroke="#8b5cf6"
-                    fill="#8b5cf6"
-                    fillOpacity={0.6}
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#customerGradient)"
+                    dot={{ fill: "#8b5cf6", r: 4, strokeWidth: 2, stroke: "white" }}
+                    activeDot={{ r: 6, stroke: "#8b5cf6", strokeWidth: 2, fill: "white" }}
                     name="Customers"
                   />
                 </AreaChart>
