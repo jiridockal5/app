@@ -89,11 +89,13 @@ export default function HomePage() {
               value: `${revenueChange.toFixed(2)}%`,
               isPositive: revenueChange >= 0,
             }}
+            tooltip="Monthly Recurring Revenue (MRR)\nTotal revenue recognized this month"
           />
           <KpiCard
             title="Cost of Sales"
             primaryValue={$$(costOfSales)}
             secondaryValue={`${((costOfSales / revenue) * 100).toFixed(1)}% of revenue`}
+            tooltip="Direct costs associated with revenue generation\nIncludes payment processing, hosting, and other direct costs"
           />
           <KpiCard
             title="Gross Margin"
@@ -103,6 +105,7 @@ export default function HomePage() {
               value: `${grossMarginPercent.toFixed(1)}%`,
               isPositive: grossMarginPercent >= 0,
             }}
+            tooltip="Revenue minus Cost of Sales\nShows profitability before operating expenses"
           />
           <KpiCard
             title="Operating Cost"
@@ -111,6 +114,7 @@ export default function HomePage() {
               value: `${operatingCostChange.toFixed(2)}%`,
               isPositive: operatingCostChange <= 0,
             }}
+            tooltip="Total operating expenses\nIncludes payroll and operational expenses (OPEX)"
           />
           <KpiCard
             title="EBITDA"
@@ -119,6 +123,7 @@ export default function HomePage() {
               value: `${ebitdaChange.toFixed(2)}%`,
               isPositive: ebitdaChange >= 0,
             }}
+            tooltip="Earnings Before Interest, Taxes, Depreciation, and Amortization\nRevenue - Cost of Sales - Operating Costs"
           />
         </div>
 
