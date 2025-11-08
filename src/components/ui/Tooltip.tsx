@@ -29,12 +29,18 @@ export default function Tooltip({ content, className }: Props) {
       <span
         id={id}
         role="tooltip"
-        className="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full whitespace-pre-line rounded-md bg-gray-900 px-3 py-2 text-xs text-white shadow-lg opacity-0 invisible transition-opacity duration-150
+        className="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full whitespace-pre-line rounded-lg bg-gray-900 px-4 py-3 text-xs leading-relaxed text-white shadow-xl opacity-0 invisible transition-all duration-200
                   peer-hover:opacity-100 peer-hover:visible
-                  peer-focus-visible:opacity-100 peer-focus-visible:visible z-50 max-w-xs"
+                  peer-focus-visible:opacity-100 peer-focus-visible:visible z-50 max-w-sm"
         aria-hidden="true"
       >
-        {content}
+        <div className="space-y-1.5">
+          {content.split('\n\n').map((paragraph, idx) => (
+            <p key={idx} className={idx === 0 ? "font-semibold text-white" : "text-gray-300 leading-relaxed"}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
         <span
           className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-gray-900"
           aria-hidden="true"

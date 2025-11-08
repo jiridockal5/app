@@ -64,6 +64,48 @@ export default function HomePage() {
   const ebitdaChange =
     lastMonthEbitda !== 0 ? ((ebitda - lastMonthEbitda) / Math.abs(lastMonthEbitda)) * 100 : 0;
 
+  // Calculate additional metrics for second row of KPIs
+  // Current and previous ARR
+  const currentArr = currentMonth ? currentMonth.closingArr : a.startArrUsd;
+  const previousArr = lastMonth ? lastMonth.closingArr : a.startArrUsd;
+  const arrChange = currentArr - previousArr;
+  const arrGrowthRate = previousArr > 0 ? ((currentArr - previousArr) / previousArr) * 100 : 0;
+
+  // Magic Number: (ΔARR × 4) / S&M spend (prev Q)
+  // Quarterly ARR change (annualized by ×4) divided by previous quarter's S&M spend
+  // Using last 3 months vs previous 3 months for quarterly comparison
+  // Assuming 30% of OPEX is Sales & Marketing
+  const smSpendMonthly = a.opexPerMonthUsd * 0.3;
+  const smSpendQuarterly = smSpendMonthly * 3;
+  
+  // Get quarterly ARR change (using last 3 months vs previous 3 months)
+  // For simplicity, using current month vs 3 months ago as proxy for quarterly change
+  const quarterAgoMonth = rows.length > 3 ? rows[rows.length - 4] : rows[0] ?? null;
+  const quarterAgoArr = quarterAgoMonth ? quarterAgoMonth.closingArr : a.startArrUsd;
+  const quarterlyArrChange = currentArr - quarterAgoArr;
+  
+  // Magic Number: (Quarterly ARR change × 4) / Previous quarter S&M spend
+  // The ×4 annualizes the quarterly change
+  const magicNumber = smSpendQuarterly > 0 ? (quarterlyArrChange * 4) / smSpendQuarterly : 0;
+
+  // Burn Multiple: Net Burn / Net New ARR
+  // Net Burn = negative EBITDA (if burning cash)
+  const netBurn = Math.max(0, -ebitda); // Only positive burn
+  const netNewArr = Math.max(0, arrChange); // Only positive ARR growth
+  const burnMultiple = netNewArr > 0 ? netBurn / (netNewArr / 12) : (netBurn > 0 ? Infinity : 0);
+
+  // Rule of 40: Growth % + EBITDA % ≥ 40%
+  // Annualized growth rate + EBITDA margin
+  const annualizedGrowthRate = arrGrowthRate * 12; // Monthly growth annualized
+  const ebitdaMargin = revenue > 0 ? (ebitda / revenue) * 100 : 0;
+  const ruleOf40 = annualizedGrowthRate + ebitdaMargin;
+
+  // Gross Margin %: Already calculated as grossMarginPercent
+
+  // Operating Margin %: EBIT / Revenue
+  // In our model, EBIT ≈ EBITDA (no separate interest/tax/depreciation)
+  const operatingMargin = revenue > 0 ? (ebitda / revenue) * 100 : 0;
+
   // Chart data - using last 12 months or available data
   const chartData = rows.slice(-12).map((r) => ({
     month: `M${r.m}`,
@@ -89,13 +131,13 @@ export default function HomePage() {
               value: `${revenueChange.toFixed(2)}%`,
               isPositive: revenueChange >= 0,
             }}
-            tooltip="Monthly Recurring Revenue (MRR)\nTotal revenue recognized this month"
+            tooltip="Monthly Recurring Revenue (MRR)\n\nRecognized revenue for the current month based on active subscriptions and contracts."
           />
           <KpiCard
             title="Cost of Sales"
             primaryValue={$$(costOfSales)}
             secondaryValue={`${((costOfSales / revenue) * 100).toFixed(1)}% of revenue`}
-            tooltip="Direct costs associated with revenue generation\nIncludes payment processing, hosting, and other direct costs"
+            tooltip="Direct costs related to revenue generation\n\nIncludes payment processing fees, hosting infrastructure, and other costs directly tied to delivering the service."
           />
           <KpiCard
             title="Gross Margin"
@@ -105,7 +147,7 @@ export default function HomePage() {
               value: `${grossMarginPercent.toFixed(1)}%`,
               isPositive: grossMarginPercent >= 0,
             }}
-            tooltip="Revenue minus Cost of Sales\nShows profitability before operating expenses"
+            tooltip="Gross Profit Margin\n\nCalculated as Revenue minus Cost of Sales. Represents profitability before accounting for operating expenses."
           />
           <KpiCard
             title="Operating Cost"
@@ -114,7 +156,7 @@ export default function HomePage() {
               value: `${operatingCostChange.toFixed(2)}%`,
               isPositive: operatingCostChange <= 0,
             }}
-            tooltip="Total operating expenses\nIncludes payroll and operational expenses (OPEX)"
+            tooltip="Total Operating Expenses\n\nCombined monthly costs including payroll (salaries and benefits) and operational expenses (tools, advertising, infrastructure, and other overhead)."
           />
           <KpiCard
             title="EBITDA"
@@ -123,7 +165,93 @@ export default function HomePage() {
               value: `${ebitdaChange.toFixed(2)}%`,
               isPositive: ebitdaChange >= 0,
             }}
-            tooltip="Earnings Before Interest, Taxes, Depreciation, and Amortization\nRevenue - Cost of Sales - Operating Costs"
+            tooltip="Earnings Before Interest, Taxes, Depreciation, and Amortization\n\nFormula: Revenue - Cost of Sales - Operating Costs\n\nMeasures operating profitability excluding financing and accounting decisions."
+          />
+        </div>
+
+        {/* KPI Cards - Second Row - 5 cards */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <KpiCard
+            title="Magic Number"
+            primaryValue={magicNumber.toFixed(2)}
+            secondaryValue={
+              magicNumber >= 0.7
+                ? "Healthy"
+                : magicNumber >= 0.5
+                ? "Moderate"
+                : "Needs improvement"
+            }
+            change={{
+              value: magicNumber >= 1.0 ? "Excellent" : magicNumber >= 0.7 ? "Good" : "Low",
+              isPositive: magicNumber >= 0.7,
+            }}
+            tooltip="Magic Number\n\nFormula: (ΔARR × 4) / S&M spend (previous quarter)\n\nMeasures sales efficiency. Target: 0.7–1.0+ is healthy. Values above 1.0 indicate excellent efficiency."
+          />
+          <KpiCard
+            title="Burn Multiple"
+            primaryValue={burnMultiple === Infinity ? "∞" : burnMultiple.toFixed(2)}
+            secondaryValue={
+              burnMultiple < 1
+                ? "Excellent"
+                : burnMultiple < 2
+                ? "Good"
+                : burnMultiple === Infinity
+                ? "No ARR growth"
+                : "Poor"
+            }
+            change={{
+              value:
+                burnMultiple < 1
+                  ? "Excellent"
+                  : burnMultiple < 2
+                  ? "Good"
+                  : burnMultiple === Infinity
+                  ? "N/A"
+                  : "Poor",
+              isPositive: burnMultiple < 2 && burnMultiple !== Infinity,
+            }}
+            tooltip="Burn Multiple\n\nFormula: Net Burn / Net New ARR\n\nIndicates how much cash is burned per dollar of new ARR. Targets: <1 = excellent; 1–2 = good; >2 = poor. Lower is better."
+          />
+          <KpiCard
+            title="Rule of 40"
+            primaryValue={`${ruleOf40.toFixed(1)}%`}
+            secondaryValue={ruleOf40 >= 40 ? "On target" : `${(40 - ruleOf40).toFixed(1)}% below target`}
+            change={{
+              value: ruleOf40 >= 40 ? "Healthy" : "Below target",
+              isPositive: ruleOf40 >= 40,
+            }}
+            tooltip="Rule of 40\n\nFormula: Growth % + EBITDA % ≥ 40%\n\nBalances growth and profitability. A combined score of 40% or higher indicates a healthy SaaS business. You can trade off growth for profitability or vice versa."
+          />
+          <KpiCard
+            title="Gross Margin %"
+            primaryValue={`${grossMarginPercent.toFixed(1)}%`}
+            secondaryValue={
+              grossMarginPercent >= 75
+                ? "Excellent"
+                : grossMarginPercent >= 70
+                ? "Good"
+                : "Infra heavy"
+            }
+            change={{
+              value:
+                grossMarginPercent >= 75
+                  ? "Excellent"
+                  : grossMarginPercent >= 70
+                  ? "Good"
+                  : "Low",
+              isPositive: grossMarginPercent >= 70,
+            }}
+            tooltip="Gross Margin Percentage\n\nFormula: (Revenue – COGS) / Revenue\n\nTypical SaaS targets: 75–90% is typical. Below 70% may indicate infrastructure-heavy operations or high cost of goods sold."
+          />
+          <KpiCard
+            title="Operating Margin %"
+            primaryValue={`${operatingMargin.toFixed(1)}%`}
+            secondaryValue={operatingMargin >= 0 ? "Profitable" : "Burning cash"}
+            change={{
+              value: operatingMargin >= 0 ? "Positive" : "Negative",
+              isPositive: operatingMargin >= 0,
+            }}
+            tooltip="Operating Margin Percentage\n\nFormula: EBIT / Revenue\n\nMeasures operating profitability as a percentage of revenue. Tracks the path to breakeven. Positive values indicate profitability; negative values indicate cash burn."
           />
         </div>
 
