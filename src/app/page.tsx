@@ -86,7 +86,6 @@ export default function HomePage() {
               value: `${arrChange.toFixed(2)}%`,
               isPositive: arrChange >= 0,
             }}
-            updated="16 minutes ago"
           />
           <KpiCard
             title="Total Active Subscriptions"
@@ -95,23 +94,19 @@ export default function HomePage() {
               value: `${subscriptionsChange.toFixed(2)}%`,
               isPositive: subscriptionsChange >= 0,
             }}
-            updated="16 minutes ago"
           />
           <KpiCard
             title="Net Billing"
             primaryValue={$$(summary.arrEnd)}
-            updated="16 minutes ago"
           />
           <KpiCard
             title="Net Payments"
             primaryValue={$$(totalCollections)}
-            updated="16 minutes ago"
           />
           <KpiCard
             title="Unpaid Invoices"
             primaryValue={formatNumber(Math.max(0, unpaidInvoices))}
             secondaryValue={$$(Math.max(0, unpaidAmount))}
-            updated="16 minutes ago"
           />
         </div>
 
@@ -127,7 +122,6 @@ export default function HomePage() {
                 value: $$(lastMonth ? lastMonth.revenue : 0),
               },
             ]}
-            updated="16 minutes ago"
           />
           <SummaryCard
             title="TODAY'S REVENUE"
@@ -156,63 +150,75 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Time Period Selector */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
-              Daily
-            </button>
-            <button className="px-4 py-2 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 border border-gray-200">
-              3 months
-            </button>
-            <button className="px-4 py-2 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 border border-gray-200">
-              6 months
-            </button>
-            <button className="px-4 py-2 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 border border-gray-200">
-              12 months
-            </button>
-          </div>
-          <div className="flex items-center space-x-2">
-            <select className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700">
-              <option>All (USD)</option>
-            </select>
-          </div>
-        </div>
-
         {/* Charts - 2 cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ChartCard
             title="Total Billing"
             primaryValue={$$(revenueThisMonth)}
-            secondaryValue={`Oct ${$$(lastMonth ? lastMonth.revenue : revenueThisMonth)}`}
-            updated="16 minutes ago"
+            secondaryValue={`Previous: ${$$(lastMonth ? lastMonth.revenue : revenueThisMonth)}`}
           >
-            <div className="h-64">
+            <div className="h-80 mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
+                <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
                   <defs>
                     <linearGradient id="colorBilling" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" stroke="#9ca3af" />
-                  <YAxis stroke="#9ca3af" />
+                  <CartesianGrid 
+                    strokeDasharray="3 3" 
+                    stroke="#e5e7eb" 
+                    vertical={false}
+                    strokeWidth={1}
+                  />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="#6b7280"
+                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                    tickLine={{ stroke: "#d1d5db" }}
+                    axisLine={{ stroke: "#d1d5db" }}
+                  />
+                  <YAxis 
+                    stroke="#6b7280"
+                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                    tickLine={{ stroke: "#d1d5db" }}
+                    axisLine={{ stroke: "#d1d5db" }}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                    width={60}
+                  />
                   <Tooltip
-                    formatter={(value: number) => $$(value)}
+                    formatter={(value: number) => [
+                      $$(value),
+                      "Billing"
+                    ]}
+                    labelFormatter={(label) => `Month ${label}`}
                     contentStyle={{
                       backgroundColor: "white",
-                      border: "1px solid #e5e7eb",
+                      border: "1px solid #d1d5db",
                       borderRadius: "8px",
+                      padding: "12px",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    }}
+                    labelStyle={{
+                      fontWeight: 600,
+                      color: "#111827",
+                      marginBottom: "4px",
+                    }}
+                    itemStyle={{
+                      color: "#3b82f6",
+                      fontWeight: 500,
                     }}
                   />
                   <Area
                     type="monotone"
                     dataKey="Billing"
                     stroke="#3b82f6"
+                    strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorBilling)"
+                    dot={false}
+                    activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "white" }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -222,35 +228,70 @@ export default function HomePage() {
           <ChartCard
             title="Total New Billing"
             primaryValue={$$((currentMonth?.newArr ?? 0) / 12)}
-            secondaryValue={`Oct ${$$((lastMonth?.newArr ?? 0) / 12)}`}
-            updated="16 minutes ago"
+            secondaryValue={`Previous: ${$$((lastMonth?.newArr ?? 0) / 12)}`}
           >
-            <div className="h-64">
+            <div className="h-80 mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
+                <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
                   <defs>
                     <linearGradient id="colorNewBilling" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" stroke="#9ca3af" />
-                  <YAxis stroke="#9ca3af" />
+                  <CartesianGrid 
+                    strokeDasharray="3 3" 
+                    stroke="#e5e7eb" 
+                    vertical={false}
+                    strokeWidth={1}
+                  />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="#6b7280"
+                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                    tickLine={{ stroke: "#d1d5db" }}
+                    axisLine={{ stroke: "#d1d5db" }}
+                  />
+                  <YAxis 
+                    stroke="#6b7280"
+                    tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                    tickLine={{ stroke: "#d1d5db" }}
+                    axisLine={{ stroke: "#d1d5db" }}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                    width={60}
+                  />
                   <Tooltip
-                    formatter={(value: number) => $$(value)}
+                    formatter={(value: number) => [
+                      $$(value),
+                      "New Billing"
+                    ]}
+                    labelFormatter={(label) => `Month ${label}`}
                     contentStyle={{
                       backgroundColor: "white",
-                      border: "1px solid #e5e7eb",
+                      border: "1px solid #d1d5db",
                       borderRadius: "8px",
+                      padding: "12px",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    }}
+                    labelStyle={{
+                      fontWeight: 600,
+                      color: "#111827",
+                      marginBottom: "4px",
+                    }}
+                    itemStyle={{
+                      color: "#10b981",
+                      fontWeight: 500,
                     }}
                   />
                   <Area
                     type="monotone"
                     dataKey="NewBilling"
                     stroke="#10b981"
+                    strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorNewBilling)"
+                    dot={false}
+                    activeDot={{ r: 6, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
                   />
                 </AreaChart>
               </ResponsiveContainer>

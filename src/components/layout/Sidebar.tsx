@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
 
 interface NavItem {
   name: string;
@@ -28,6 +29,111 @@ const isActivePath = (pathname: string, href: string) => {
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Filter nav items based on search query
+  const filteredItems = navItems.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+K or Cmd+K to open search
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        inputRef.current?.focus();
+        setIsOpen(true);
+      }
+      // Escape to close
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+        setSearchQuery("");
+        inputRef.current?.blur();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+  // Handle keyboard navigation in dropdown
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen || filteredItems.length === 0) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev < filteredItems.length - 1 ? prev + 1 : 0
+        );
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev > 0 ? prev - 1 : filteredItems.length - 1
+        );
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (filteredItems[selectedIndex]) {
+          router.push(filteredItems[selectedIndex].href);
+          setIsOpen(false);
+          setSearchQuery("");
+          inputRef.current?.blur();
+        }
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [isOpen, filteredItems, selectedIndex, router]);
+
+  // Reset selected index when search changes
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [searchQuery]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+        setSearchQuery("");
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const handleItemClick = (href: string) => {
+    router.push(href);
+    setIsOpen(false);
+    setSearchQuery("");
+    inputRef.current?.blur();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setIsOpen(true);
+  };
+
+  const handleInputFocus = () => {
+    setIsOpen(true);
+  };
 
   return (
     <aside className="w-64 bg-slate-900 text-white min-h-screen flex flex-col">
@@ -83,15 +189,58 @@ export function Sidebar() {
       </div>
 
       {/* Search */}
-      <div className="p-4 border-b border-slate-700">
+      <div className="p-4 border-b border-slate-700 relative">
         <div className="relative">
           <input
+            ref={inputRef}
             type="text"
             placeholder="Go to"
-            className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-slate-600"
+            value={searchQuery}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-slate-600 focus:ring-1 focus:ring-slate-600"
           />
-          <span className="absolute right-2 top-2 text-xs text-slate-400">Ctrl K</span>
+          <span className="absolute right-2 top-2 text-xs text-slate-400 pointer-events-none">
+            Ctrl K
+          </span>
         </div>
+        
+        {/* Dropdown Results */}
+        {isOpen && searchQuery && filteredItems.length > 0 && (
+          <div
+            ref={dropdownRef}
+            className="absolute top-full left-4 right-4 mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto"
+          >
+            {filteredItems.map((item, index) => {
+              const isActive = isActivePath(pathname, item.href);
+              const isSelected = index === selectedIndex;
+              return (
+                <button
+                  key={item.href}
+                  onClick={() => handleItemClick(item.href)}
+                  className={`w-full flex items-center space-x-3 px-3 py-2 text-sm transition-colors ${
+                    isSelected
+                      ? "bg-blue-600 text-white"
+                      : isActive
+                      ? "bg-slate-700 text-white"
+                      : "text-slate-300 hover:bg-slate-700 hover:text-white"
+                  }`}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span>{item.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+        
+        {/* No results message */}
+        {isOpen && searchQuery && filteredItems.length === 0 && (
+          <div className="absolute top-full left-4 right-4 mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-50 p-3">
+            <p className="text-sm text-slate-400">No results found</p>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
@@ -137,4 +286,3 @@ export function Sidebar() {
     </aside>
   );
 }
-
