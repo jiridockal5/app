@@ -16,10 +16,11 @@ import {
 } from "recharts";
 
 const $$ = (n: number) =>
-  n.toLocaleString(undefined, {
+  n.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
   });
 
 const formatNumber = (n: number) =>
