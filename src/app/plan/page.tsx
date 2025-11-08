@@ -38,7 +38,7 @@ export default function PlanPage() {
   }));
 
   return (
-    <main className="min-h-screen p-6 md:p-10 bg-gray-50">
+    <main className="flex-1 p-6 md:p-10 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex items-baseline justify-between">
           <h1 className="text-2xl md:text-3xl font-semibold">Plan</h1>
