@@ -93,7 +93,6 @@ export default function BusinessDashboardPage() {
   // Chart data
   const chartData = rows.slice(0, 12).map((r) => ({
     month: `M${r.m}`,
-    ARR: Math.round(r.closingArr),
     MRR: Math.round(r.revenue),
     Customers: Math.round(r.closingArr / a.acvUsd),
   }));
@@ -336,7 +335,7 @@ export default function BusinessDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">
-              ARR & MRR Growth
+              MRR Growth
             </h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
@@ -345,10 +344,6 @@ export default function BusinessDashboardPage() {
                   margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
                 >
                   <defs>
-                    <linearGradient id="arrGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                    </linearGradient>
                     <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
@@ -376,9 +371,9 @@ export default function BusinessDashboardPage() {
                     width={65}
                   />
                   <Tooltip
-                    formatter={(value: number, name: string) => [
-                      name === "ARR" || name === "MRR" ? $$(value) : formatNumber(value),
-                      name
+                    formatter={(value: number) => [
+                      $$(value),
+                      "MRR"
                     ]}
                     labelFormatter={(label) => `Month ${label}`}
                     contentStyle={{
@@ -394,26 +389,18 @@ export default function BusinessDashboardPage() {
                       marginBottom: "4px",
                     }}
                     itemStyle={{
+                      color: "#10b981",
                       fontWeight: 500,
                     }}
                   />
                   <Legend 
                     wrapperStyle={{ paddingTop: "20px" }}
                     iconType="line"
-                    formatter={(value) => (
+                    formatter={() => (
                       <span style={{ color: "#374151", fontSize: "13px", fontWeight: 500 }}>
-                        {value === "ARR" ? "→ ARR" : value === "MRR" ? "→ MRR" : value}
+                        → MRR
                       </span>
                     )}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="ARR"
-                    stroke="#3b82f6"
-                    strokeWidth={3}
-                    dot={{ fill: "#3b82f6", r: 4, strokeWidth: 2, stroke: "white" }}
-                    activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "white" }}
-                    name="ARR"
                   />
                   <Line
                     type="monotone"
