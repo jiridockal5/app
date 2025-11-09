@@ -9,7 +9,6 @@ import {
   ResponsiveContainer,
   Area,
   AreaChart,
-  LinearGradient,
   Defs,
 } from "recharts";
 
@@ -433,10 +432,10 @@ export default function RevenueForecastPage() {
                 margin={{ top: 20, right: 40, left: 20, bottom: 30 }}
               >
                 <Defs>
-                  <LinearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
-                  </LinearGradient>
+                  </linearGradient>
                 </Defs>
                 <CartesianGrid 
                   strokeDasharray="3 3" 
