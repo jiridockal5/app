@@ -69,6 +69,7 @@ export default function RevenueForecastPage() {
       churnMRR: number;
       netNewMRR: number;
       endingMRR: number;
+      cashInflow: number;
       ARR: number;
     }> = [];
 
@@ -121,6 +122,7 @@ export default function RevenueForecastPage() {
         churnMRR: Math.round(churnMRR),
         netNewMRR: Math.round(netNewMRR),
         endingMRR: Math.round(mrr),
+        cashInflow: Math.round(mrr), // v1: monthly billing, no lag → cash = ending MRR
         ARR: Math.round(mrr * 12),
       });
     }
@@ -543,6 +545,9 @@ export default function RevenueForecastPage() {
                     Ending MRR
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Cash Inflow
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ARR
                   </th>
                 </tr>
@@ -572,6 +577,9 @@ export default function RevenueForecastPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right tabular-nums font-semibold text-gray-900">
                       {formatCurrency(row.endingMRR)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right tabular-nums text-blue-600 font-medium">
+                      {formatCurrency(row.cashInflow)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right tabular-nums text-green-600 font-medium">
                       {formatCurrency(row.ARR)}
