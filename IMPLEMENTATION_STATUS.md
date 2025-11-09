@@ -31,22 +31,25 @@
 
 ### Pages
 - ✅ `/plan` - Plan summary page with KPIs, charts, and table
-- ✅ Root page redirects to `/plan`
+- ✅ `/wizard` - Setup wizard (10-12 inputs) with 3-step form
+- ✅ `/dials` - Live dials editor for real-time adjustments
+- ✅ `/` - Financial dashboard with 10 KPIs
+- ✅ `/revenue` - Revenue forecast page
+- ✅ `/business` - SaaS Metrics dashboard
+- ✅ `/people` - People & Payroll management
+- ✅ Root page shows financial dashboard
+
+### Features
+- ✅ LocalStorage persistence for scenarios (automatic save/load)
+- ✅ CSV export of monthly table
+- ✅ Navigation between pages (sidebar with search)
+- ⏳ PDF export (simple client print)
+- ⏳ Guardrails (heatbars, warnings)
 
 ## 🚧 Remaining Tasks
 
 ### Pages
-- ⏳ `/wizard` - Setup wizard (10-12 inputs)
-- ⏳ `/dials` - Live dials editor
-- ⏳ `/people` - People editor (counts × avg cost)
-- ⏳ `/spend` - Spend editor (5 buckets per team)
-
-### Features
-- ⏳ LocalStorage persistence for scenarios
-- ⏳ CSV export of monthly table
-- ⏳ PDF export (simple client print)
-- ⏳ Guardrails (heatbars, warnings)
-- ⏳ Navigation between pages
+- ⏳ `/spend` - Spend editor (5 buckets per team) - partially implemented in `/expenses`
 
 ### Testing
 - ⏳ More comprehensive unit tests
@@ -64,13 +67,15 @@ The scaffold is functional with:
 
 ## Next Steps
 
-1. Create wizard page for initial setup
-2. Create dials page for live adjustments
-3. Create people and spend editors
-4. Add localStorage persistence
-5. Add export functionality
-6. Add guardrails and warnings
-7. Improve test coverage
+1. ✅ Create wizard page for initial setup
+2. ✅ Create dials page for live adjustments
+3. ✅ Add localStorage persistence
+4. ✅ Add CSV export functionality
+5. ✅ Improve navigation between pages
+6. ⏳ Add PDF export (client print)
+7. ⏳ Add guardrails and warnings (KPI thresholds)
+8. ⏳ Improve test coverage
+9. ⏳ Enhance spend editor with 5 buckets per team
 
 ## Running the Application
 

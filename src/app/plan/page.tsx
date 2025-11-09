@@ -16,6 +16,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import { Button } from "@/components/ui/Button";
 
 const $$ = (n: number) =>
   n.toLocaleString("en-US", {
@@ -37,6 +38,55 @@ export default function PlanPage() {
     Spend: Math.round(r.payroll + r.opex),
     Cash: Math.round(r.cashEnd),
   }));
+
+  const handleExportCSV = () => {
+    const headers = [
+      "Month",
+      "Opening ARR",
+      "New ARR",
+      "Churn ARR",
+      "Upsell ARR",
+      "Closing ARR",
+      "Revenue",
+      "Collections",
+      "Payroll",
+      "Opex",
+      "Burn",
+      "Cash End",
+    ];
+
+    const csvRows = [
+      headers.join(","),
+      ...rows.map((r) =>
+        [
+          r.m,
+          Math.round(r.openingArr),
+          Math.round(r.newArr),
+          Math.round(r.churnArr),
+          Math.round(r.upsellArr),
+          Math.round(r.closingArr),
+          Math.round(r.revenue),
+          Math.round(r.collections),
+          Math.round(r.payroll),
+          Math.round(r.opex),
+          Math.round(r.burn),
+          Math.round(r.cashEnd),
+        ].join(",")
+      ),
+    ];
+
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", `saas-budget-plan-${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <main className="flex-1 p-6 md:p-10 bg-gray-50">
@@ -90,6 +140,11 @@ export default function PlanPage() {
         </section>
 
         <Card title="Monthly table">
+          <div className="flex justify-end mb-4">
+            <Button onClick={handleExportCSV} variant="secondary">
+              Export CSV
+            </Button>
+          </div>
           <Table rows={rows} />
         </Card>
       </div>

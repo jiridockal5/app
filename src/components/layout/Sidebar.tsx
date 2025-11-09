@@ -12,11 +12,13 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: "Financial dashboard", href: "/", icon: "🏠" },
+  { name: "Wizard", href: "/wizard", icon: "⚙️" },
+  { name: "Dials", href: "/dials", icon: "🎛️" },
+  { name: "Plan", href: "/plan", icon: "📊" },
   { name: "SaaS Metrics", href: "/business", icon: "📈" },
   { name: "Revenue", href: "/revenue", icon: "💰" },
   { name: "Expenses", href: "/expenses", icon: "💸" },
   { name: "People", href: "/people", icon: "👥" },
-  { name: "Plan", href: "/plan", icon: "📊" },
 ];
 
 // Helper to check if pathname matches (handles root path)
