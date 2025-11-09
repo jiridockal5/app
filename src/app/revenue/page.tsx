@@ -9,7 +9,6 @@ import {
   ResponsiveContainer,
   Area,
   AreaChart,
-  Defs,
 } from "recharts";
 
 const formatCurrency = (n: number) =>
@@ -431,12 +430,6 @@ export default function RevenueForecastPage() {
                 data={data} 
                 margin={{ top: 20, right: 40, left: 20, bottom: 30 }}
               >
-                <Defs>
-                  <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
-                  </linearGradient>
-                </Defs>
                 <CartesianGrid 
                   strokeDasharray="3 3" 
                   stroke="#f3f4f6" 
@@ -506,7 +499,8 @@ export default function RevenueForecastPage() {
                   dataKey="endingMRR"
                   stroke="#2563eb"
                   strokeWidth={4}
-                  fill="url(#mrrGradient)"
+                  fill="#3b82f6"
+                  fillOpacity={0.3}
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   dot={false}
