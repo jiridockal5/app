@@ -2,14 +2,15 @@
 
 import { useState, useMemo } from "react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
-  Legend,
+  Area,
+  AreaChart,
+  LinearGradient,
+  Defs,
 } from "recharts";
 
 const formatCurrency = (n: number) =>
@@ -420,152 +421,105 @@ export default function RevenueForecastPage() {
         </div>
 
         {/* Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Monthly Recurring Revenue</h2>
-              <p className="text-sm text-gray-500">Projected MRR growth over time</p>
-            </div>
-            <div className="hidden md:flex items-center gap-4">
-              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg border border-blue-100">
-                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                <span className="text-sm font-medium text-blue-700">MRR</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-red-50 rounded-lg border border-red-100">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <span className="text-sm font-medium text-red-700">Churn</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-lg border border-green-100">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-sm font-medium text-green-700">Expansions</span>
-              </div>
-            </div>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 md:p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Monthly Recurring Revenue</h2>
+            <p className="text-sm text-gray-600">Projected MRR growth over 24 months</p>
           </div>
-          <div className="h-[450px] w-full">
+          <div className="h-[500px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart 
+              <AreaChart 
                 data={data} 
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                margin={{ top: 20, right: 40, left: 20, bottom: 30 }}
               >
+                <Defs>
+                  <LinearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
+                  </LinearGradient>
+                </Defs>
                 <CartesianGrid 
                   strokeDasharray="3 3" 
-                  stroke="#e5e7eb" 
+                  stroke="#f3f4f6" 
                   vertical={false}
-                  strokeOpacity={0.6}
+                  strokeOpacity={0.5}
                 />
                 <XAxis
                   dataKey="month"
                   stroke="#9ca3af"
-                  tick={{ fill: "#6b7280", fontSize: 13, fontWeight: 500 }}
-                  tickLine={{ stroke: "#d1d5db" }}
-                  axisLine={{ stroke: "#e5e7eb" }}
+                  tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                  tickLine={false}
+                  axisLine={{ stroke: "#e5e7eb", strokeWidth: 1.5 }}
                   label={{ 
                     value: "Month", 
                     position: "insideBottom", 
-                    offset: -8, 
+                    offset: -10, 
                     fill: "#6b7280",
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 600
                   }}
-                  tickMargin={10}
+                  tickMargin={12}
+                  interval={2}
                 />
                 <YAxis
                   stroke="#9ca3af"
-                  tick={{ fill: "#6b7280", fontSize: 13, fontWeight: 500 }}
-                  tickLine={{ stroke: "#d1d5db" }}
-                  axisLine={{ stroke: "#e5e7eb" }}
+                  tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                  tickLine={false}
+                  axisLine={{ stroke: "#e5e7eb", strokeWidth: 1.5 }}
                   tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                  width={75}
-                  tickMargin={10}
+                  width={80}
+                  tickMargin={12}
                   label={{ 
-                    value: "Revenue", 
+                    value: "Revenue (MRR)", 
                     angle: -90, 
                     position: "insideLeft", 
                     fill: "#6b7280",
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 600,
                     style: { textAnchor: 'middle' }
                   }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "rgba(255, 255, 255, 0.98)",
+                    backgroundColor: "#ffffff",
                     border: "1px solid #e5e7eb",
                     borderRadius: "12px",
-                    padding: "16px",
-                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                    backdropFilter: "blur(10px)",
+                    padding: "12px 16px",
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                   }}
                   labelStyle={{
                     color: "#111827",
-                    fontSize: "14px",
+                    fontSize: "13px",
                     fontWeight: 600,
-                    marginBottom: "8px",
+                    marginBottom: "6px",
                   }}
                   itemStyle={{
                     color: "#374151",
                     fontSize: "14px",
-                    fontWeight: 500,
+                    fontWeight: 600,
                   }}
                   formatter={(value: number) => formatCurrency(value)}
                   labelFormatter={(label) => `Month ${label}`}
-                  cursor={{ stroke: "#3b82f6", strokeWidth: 2, strokeDasharray: "5 5" }}
+                  cursor={{ stroke: "#3b82f6", strokeWidth: 2, strokeOpacity: 0.3 }}
                 />
-                <Legend />
-                <Line
+                <Area
                   type="monotone"
                   dataKey="endingMRR"
-                  name="MRR"
-                  stroke="#3b82f6"
-                  strokeWidth={3}
+                  stroke="#2563eb"
+                  strokeWidth={4}
+                  fill="url(#mrrGradient)"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   dot={false}
                   activeDot={{ 
-                    r: 8, 
-                    stroke: "#2563eb", 
+                    r: 10, 
+                    stroke: "#1d4ed8", 
                     strokeWidth: 3, 
                     fill: "#ffffff",
-                    filter: "drop-shadow(0 4px 6px rgba(59, 130, 246, 0.3))"
+                    filter: "drop-shadow(0 4px 8px rgba(37, 99, 235, 0.4))"
                   }}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
                 />
-                <Line
-                  type="monotone"
-                  dataKey="churnMRR"
-                  name="Churn (monthly)"
-                  stroke="#ef4444"
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  dot={false}
-                  activeDot={{ 
-                    r: 6, 
-                    stroke: "#dc2626", 
-                    strokeWidth: 2, 
-                    fill: "#ffffff",
-                    filter: "drop-shadow(0 4px 6px rgba(239, 68, 68, 0.3))"
-                  }}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="expansionMRR"
-                  name="Expansions (monthly)"
-                  stroke="#10b981"
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  dot={false}
-                  activeDot={{ 
-                    r: 6, 
-                    stroke: "#059669", 
-                    strokeWidth: 2, 
-                    fill: "#ffffff",
-                    filter: "drop-shadow(0 4px 6px rgba(16, 185, 129, 0.3))"
-                  }}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
