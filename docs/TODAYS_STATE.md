@@ -29,7 +29,7 @@
 - ✅ `KpiCard` - Dashboard KPI cards with tooltips
 - ✅ `Sidebar` - Navigation with search (Ctrl+K)
 - ✅ Chart components (Recharts integration)
-- ⚠️ Some components may be unused (check dials/, plan/, tiles/)
+- ⚠️ Some components may be unused (check plan/, tiles/)
 
 ### Key Features Implemented
 1. **Financial Dashboard** (`/`)

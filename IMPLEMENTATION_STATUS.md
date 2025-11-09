@@ -34,7 +34,6 @@ _Last updated: 2024-12-19_
 ### Pages
 - ✅ `/plan` - Plan summary page with KPIs, charts, and table
 - ✅ `/wizard` - Setup wizard (10-12 inputs) with 3-step form
-- ✅ `/dials` - Live dials editor for real-time adjustments
 - ✅ `/` - Financial dashboard with 10 KPIs
 - ✅ `/revenue` - Revenue forecast page
 - ✅ `/business` - SaaS Metrics dashboard
@@ -70,14 +69,13 @@ The scaffold is functional with:
 ## Next Steps
 
 1. ✅ Create wizard page for initial setup
-2. ✅ Create dials page for live adjustments
-3. ✅ Add localStorage persistence
-4. ✅ Add CSV export functionality
-5. ✅ Improve navigation between pages
-6. ⏳ Add PDF export (client print)
-7. ⏳ Add guardrails and warnings (KPI thresholds)
-8. ⏳ Improve test coverage
-9. ⏳ Enhance spend editor with 5 buckets per team
+2. ✅ Add localStorage persistence
+3. ✅ Add CSV export functionality
+4. ✅ Improve navigation between pages
+5. ⏳ Add PDF export (client print)
+6. ⏳ Add guardrails and warnings (KPI thresholds)
+7. ⏳ Improve test coverage
+8. ⏳ Enhance spend editor with 5 buckets per team
 
 ## Running the Application
 

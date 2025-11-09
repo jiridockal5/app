@@ -4,12 +4,12 @@ import { useState, useMemo } from "react";
 import {
   LineChart,
   Line,
-  Area,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 
 const formatCurrency = (n: number) =>
@@ -23,25 +23,28 @@ const formatCurrency = (n: number) =>
 const formatNumber = (n: number) => n.toLocaleString("en-US");
 
 export default function RevenueForecastPage() {
+  // Global settings incl. churn & expansion as % values users enter (e.g., 3 = 3%)
   const [settings, setSettings] = useState({
     months: 24,
     starting_mrr: 10000,
+    churn_pct: 4,       // monthly %
+    expansion_pct: 3,   // monthly %
   });
 
+  // Engines: additive only (new business)
   const [plg, setPlg] = useState({
     enabled: true,
     signups: 5000,
-    activation_rate: 0.4, // 40% activation rate (users who activate/trial)
-    conversion_rate: 0.03, // 3% conversion rate (activated users who convert to paid)
-    arpu: 25, // Average Revenue Per User per month
+    conversion_rate: 3, // %
+    arpu: 25,
   });
 
   const [sales, setSales] = useState({
     enabled: true,
     pipeline_value: 150000,
-    win_rate: 0.2,
+    win_rate: 20,          // %
     sales_cycle_months: 2,
-    acv: 4800,
+    acv: 4800,             // kept for future use if needed
   });
 
   const [partners, setPartners] = useState({
@@ -50,15 +53,22 @@ export default function RevenueForecastPage() {
     new_partners_per_month: 2,
     avg_customers_per_partner: 4,
     arpu: 40,
-    commission_rate: 0.2,
+    commission_rate: 20,   // %
   });
 
   const forecastRevenue = useMemo(() => {
-    const months = settings.months;
-    let mrr = settings.starting_mrr;
+    const months = Math.max(1, settings.months);
+    let mrr = Number(settings.starting_mrr) || 0;
+
+    const churnRate = Math.max(0, settings.churn_pct) / 100;
+    const expansionRate = Math.max(0, settings.expansion_pct) / 100;
+
     const result: Array<{
       month: number;
       newMRR: number;
+      expansionMRR: number;
+      churnMRR: number;
+      netNewMRR: number;
       endingMRR: number;
       ARR: number;
     }> = [];
@@ -66,35 +76,51 @@ export default function RevenueForecastPage() {
     for (let month = 1; month <= months; month++) {
       let newMRR = 0;
 
+      // --- PLG new business ---
       if (plg.enabled) {
-        // PLG Revenue = Signups × Activation Rate × Conversion Rate × ARPU
-        const plgRevenue = plg.signups * plg.activation_rate * plg.conversion_rate * plg.arpu;
-        newMRR += plgRevenue;
+        const conv = Math.max(0, plg.conversion_rate) / 100;
+        const newUsers = (Number(plg.signups) || 0) * conv;
+        newMRR += newUsers * (Number(plg.arpu) || 0);
       }
 
+      // --- Sales new business ---
       if (sales.enabled) {
-        const closedValue =
-          (sales.pipeline_value * sales.win_rate) / Math.max(1, sales.sales_cycle_months);
-        newMRR += closedValue / 12;
+        const win = Math.max(0, sales.win_rate) / 100;
+        const cycle = Math.max(1, Number(sales.sales_cycle_months) || 1);
+        const closedValue = (Number(sales.pipeline_value) || 0) * win / cycle;
+        newMRR += closedValue / 12; // ACV->MRR equivalent
       }
 
+      // --- Partners new business (growing partner base) ---
       if (partners.enabled) {
         const effectivePartners =
-          partners.partners_active + (month - 1) * partners.new_partners_per_month;
+          (Number(partners.partners_active) || 0) +
+          (month - 1) * (Number(partners.new_partners_per_month) || 0);
+
+        const commission = Math.max(0, Math.min(100, partners.commission_rate)) / 100;
+
         const partnerMRR =
           effectivePartners *
-          partners.avg_customers_per_partner *
-          partners.arpu *
-          (1 - partners.commission_rate);
+          (Number(partners.avg_customers_per_partner) || 0) *
+          (Number(partners.arpu) || 0) *
+          (1 - commission);
+
         newMRR += partnerMRR;
       }
 
-      const netNewMRR = newMRR;
+      // --- Global churn & expansion on prior MRR ---
+      const expansionMRR = mrr * expansionRate;
+      const churnMRR = mrr * churnRate;
+
+      const netNewMRR = newMRR + expansionMRR - churnMRR;
       mrr += netNewMRR;
 
       result.push({
         month,
         newMRR: Math.round(newMRR),
+        expansionMRR: Math.round(expansionMRR),
+        churnMRR: Math.round(churnMRR),
+        netNewMRR: Math.round(netNewMRR),
         endingMRR: Math.round(mrr),
         ARR: Math.round(mrr * 12),
       });
@@ -114,7 +140,7 @@ export default function RevenueForecastPage() {
       : 0;
 
     return {
-      startingMRR: first.endingMRR - first.newMRR,
+      startingMRR: first.endingMRR - first.netNewMRR,
       endingMRR: last.endingMRR,
       endingARR: last.ARR,
       totalNewMRR,
@@ -146,7 +172,7 @@ export default function RevenueForecastPage() {
                   max={60}
                   value={settings.months}
                   onChange={(e) =>
-                    setSettings({ ...settings, months: parseInt(e.target.value || "1") })
+                    setSettings({ ...settings, months: Math.max(1, parseInt(e.target.value || "1")) })
                   }
                   className="w-16 text-center font-semibold text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
@@ -167,6 +193,55 @@ export default function RevenueForecastPage() {
             </div>
           </div>
         </header>
+
+        {/* Global Assumptions */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Global Assumptions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-gray-700">
+                Churn % / month
+              </label>
+              <p className="text-xs text-gray-500">Percentage of MRR lost each month</p>
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.1"
+                  min={0}
+                  value={settings.churn_pct}
+                  onChange={(e) =>
+                    setSettings({ ...settings, churn_pct: Math.max(0, parseFloat(e.target.value) || 0) })
+                  }
+                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors text-gray-900 font-medium"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                  %
+                </span>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-gray-700">
+                Expansion % / month
+              </label>
+              <p className="text-xs text-gray-500">Percentage of MRR gained from upsells/expansions</p>
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.1"
+                  min={0}
+                  value={settings.expansion_pct}
+                  onChange={(e) =>
+                    setSettings({ ...settings, expansion_pct: Math.max(0, parseFloat(e.target.value) || 0) })
+                  }
+                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors text-gray-900 font-medium"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                  %
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Summary KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -224,46 +299,34 @@ export default function RevenueForecastPage() {
                 title="Product-Led Growth"
                 icon="🚀"
                 color="blue"
-                formula="Revenue = Signups × Activation Rate × Conversion Rate × ARPU"
+                formula="Revenue = Signups × Conversion Rate × ARPU"
                 inputs={[
-                {
-                  key: "signups",
-                  label: "Monthly Signups",
-                  value: plg.signups,
-                  onChange: (v) => setPlg({ ...plg, signups: v }),
-                  type: "number",
-                  format: formatNumber,
-                  description: "Total monthly user signups",
-                },
-                {
-                  key: "activation_rate",
-                  label: "Activation Rate",
-                  value: plg.activation_rate * 100,
-                  onChange: (v) => {
-                    if (!isNaN(v)) setPlg({ ...plg, activation_rate: v / 100 });
+                  {
+                    key: "signups",
+                    label: "Monthly Signups",
+                    value: plg.signups,
+                    onChange: (v) => setPlg({ ...plg, signups: v }),
+                    type: "number",
+                    format: formatNumber,
+                    description: "Total monthly user signups",
                   },
-                  type: "percentage",
-                  description: "% of signups that activate/trial",
-                },
-                {
-                  key: "conversion_rate",
-                  label: "Conversion Rate",
-                  value: plg.conversion_rate * 100,
-                  onChange: (v) => {
-                    if (!isNaN(v)) setPlg({ ...plg, conversion_rate: v / 100 });
+                  {
+                    key: "conversion_rate",
+                    label: "Conversion Rate",
+                    value: plg.conversion_rate,
+                    onChange: (v) => setPlg({ ...plg, conversion_rate: v }),
+                    type: "percentage",
+                    description: "% of signups that convert to paid",
                   },
-                  type: "percentage",
-                  description: "% of activated users that convert to paid",
-                },
-                {
-                  key: "arpu",
-                  label: "ARPU (Monthly)",
-                  value: plg.arpu,
-                  onChange: (v) => setPlg({ ...plg, arpu: v }),
-                  type: "currency",
-                  description: "Average Revenue Per User per month",
-                },
-              ]}
+                  {
+                    key: "arpu",
+                    label: "ARPU (Monthly)",
+                    value: plg.arpu,
+                    onChange: (v) => setPlg({ ...plg, arpu: v }),
+                    type: "currency",
+                    description: "Average Revenue Per User per month",
+                  },
+                ]}
               />
             </div>
           )}
@@ -284,10 +347,8 @@ export default function RevenueForecastPage() {
                 {
                   key: "win_rate",
                   label: "Win Rate",
-                  value: sales.win_rate * 100,
-                  onChange: (v) => {
-                    if (!isNaN(v)) setSales({ ...sales, win_rate: v / 100 });
-                  },
+                  value: sales.win_rate,
+                  onChange: (v) => setSales({ ...sales, win_rate: v }),
                   type: "percentage",
                 },
                 {
@@ -349,10 +410,8 @@ export default function RevenueForecastPage() {
                 {
                   key: "commission_rate",
                   label: "Commission Rate",
-                  value: partners.commission_rate * 100,
-                  onChange: (v) => {
-                    if (!isNaN(v)) setPartners({ ...partners, commission_rate: v / 100 });
-                  },
+                  value: partners.commission_rate,
+                  onChange: (v) => setPartners({ ...partners, commission_rate: v }),
                   type: "percentage",
                 },
               ]}
@@ -365,11 +424,17 @@ export default function RevenueForecastPage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-1">Monthly Recurring Revenue</h2>
-              <p className="text-sm text-gray-500">Projected MRR growth over time</p>
+              <p className="text-sm text-gray-500">Projected MRR and ARR growth over time</p>
             </div>
-            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg border border-blue-100">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600"></div>
-              <span className="text-sm font-medium text-blue-700">MRR</span>
+            <div className="hidden md:flex items-center gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                <span className="text-sm font-medium text-blue-700">MRR</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-lg border border-green-100">
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <span className="text-sm font-medium text-green-700">ARR</span>
+              </div>
             </div>
           </div>
           <div className="h-[450px] w-full">
@@ -378,12 +443,6 @@ export default function RevenueForecastPage() {
                 data={data} 
                 margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
               >
-                <defs>
-                  <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
-                  </linearGradient>
-                </defs>
                 <CartesianGrid 
                   strokeDasharray="3 3" 
                   stroke="#e5e7eb" 
@@ -415,7 +474,7 @@ export default function RevenueForecastPage() {
                   width={75}
                   tickMargin={10}
                   label={{ 
-                    value: "MRR", 
+                    value: "Revenue", 
                     angle: -90, 
                     position: "insideLeft", 
                     fill: "#6b7280",
@@ -448,18 +507,13 @@ export default function RevenueForecastPage() {
                   labelFormatter={(label) => `Month ${label}`}
                   cursor={{ stroke: "#3b82f6", strokeWidth: 2, strokeDasharray: "5 5" }}
                 />
-                <Area
-                  type="monotone"
-                  dataKey="endingMRR"
-                  stroke="none"
-                  fill="url(#mrrGradient)"
-                  fillOpacity={1}
-                />
+                <Legend />
                 <Line
                   type="monotone"
                   dataKey="endingMRR"
+                  name="MRR"
                   stroke="#3b82f6"
-                  strokeWidth={4}
+                  strokeWidth={3}
                   dot={false}
                   activeDot={{ 
                     r: 8, 
@@ -467,6 +521,23 @@ export default function RevenueForecastPage() {
                     strokeWidth: 3, 
                     fill: "#ffffff",
                     filter: "drop-shadow(0 4px 6px rgba(59, 130, 246, 0.3))"
+                  }}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="ARR"
+                  name="ARR"
+                  stroke="#10b981"
+                  strokeWidth={3}
+                  dot={false}
+                  activeDot={{ 
+                    r: 8, 
+                    stroke: "#059669", 
+                    strokeWidth: 3, 
+                    fill: "#ffffff",
+                    filter: "drop-shadow(0 4px 6px rgba(16, 185, 129, 0.3))"
                   }}
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -490,6 +561,15 @@ export default function RevenueForecastPage() {
                     New MRR
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Expansion MRR
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Churn MRR
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Net New MRR
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Ending MRR
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -510,6 +590,15 @@ export default function RevenueForecastPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right tabular-nums text-gray-700">
                       {formatCurrency(row.newMRR)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right tabular-nums text-green-600">
+                      {formatCurrency(row.expansionMRR)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right tabular-nums text-red-600">
+                      -{formatCurrency(row.churnMRR)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right tabular-nums font-medium text-gray-900">
+                      {formatCurrency(row.netNewMRR)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right tabular-nums font-semibold text-gray-900">
                       {formatCurrency(row.endingMRR)}

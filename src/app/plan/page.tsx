@@ -91,11 +91,8 @@ export default function PlanPage() {
   return (
     <main className="flex-1 p-6 md:p-10 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8">
-        <header className="flex items-baseline justify-between">
+        <header>
           <h1 className="text-2xl md:text-3xl font-semibold">Plan</h1>
-          <span className="text-sm text-gray-500">
-            Five dials → Revenue, Spend, Cash
-          </span>
         </header>
 
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
