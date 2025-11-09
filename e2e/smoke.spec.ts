@@ -42,8 +42,8 @@ test.describe('Smoke Tests', () => {
   test('Revenue forecast page loads', async ({ page }) => {
     await page.goto('/revenue');
     
-    // Check for revenue page content
-    await expect(page.locator('text=Revenue Forecast').or(page.locator('text=Revenue')).first()).toBeVisible({ timeout: 5000 });
+    // Check for revenue page content - updated to match new page title
+    await expect(page.locator('h1:has-text("Revenue")').first()).toBeVisible({ timeout: 5000 });
     
     // Check page loads without errors
     const errors: string[] = [];
@@ -90,4 +90,5 @@ test.describe('Smoke Tests', () => {
     }
   });
 });
+
 

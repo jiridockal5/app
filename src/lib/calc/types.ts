@@ -36,3 +36,4 @@ export type PlanSummary = {
   runwayMonths: number | "∞";
 };
 
+

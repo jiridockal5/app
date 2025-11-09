@@ -4,7 +4,7 @@
 
 
 
-import React, { useState } from "react";
+import { useState } from "react";
 
 import {
 
@@ -308,45 +308,45 @@ export default function RevenueForecastPage() {
 
             <h2 className="font-semibold mb-2">PLG Inputs</h2>
 
-            {(
-
-              [
-
-                ["signups", "Monthly Signups"],
-
-                ["conversion_rate", "Conversion Rate (%)"],
-
-                ["arpu", "ARPU (Monthly)"],
-
-              ] as const
-
-            ).map(([key, label]) => (
-
-              <div key={key} className="flex justify-between mb-2">
-
-                <label>{label}</label>
-
-                <input
-
-                  type="number"
-
-                  step="any"
-
-                  value={(plg as any)[key]}
-
-                  onChange={(e) =>
-
-                    setPlg({ ...plg, [key]: parseFloat(e.target.value) })
-
+            <div className="flex justify-between mb-2">
+              <label>Monthly Signups</label>
+              <input
+                type="number"
+                step="any"
+                value={plg.signups}
+                onChange={(e) =>
+                  setPlg({ ...plg, signups: parseFloat(e.target.value) })
+                }
+                className="w-28 border rounded px-2"
+              />
+            </div>
+            <div className="flex justify-between mb-2">
+              <label>Conversion Rate (%)</label>
+              <input
+                type="number"
+                step="any"
+                value={plg.conversion_rate * 100}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (!isNaN(value)) {
+                    setPlg({ ...plg, conversion_rate: value / 100 });
                   }
-
-                  className="w-28 border rounded px-2"
-
-                />
-
-              </div>
-
-            ))}
+                }}
+                className="w-28 border rounded px-2"
+              />
+            </div>
+            <div className="flex justify-between mb-2">
+              <label>ARPU (Monthly)</label>
+              <input
+                type="number"
+                step="any"
+                value={plg.arpu}
+                onChange={(e) =>
+                  setPlg({ ...plg, arpu: parseFloat(e.target.value) })
+                }
+                className="w-28 border rounded px-2"
+              />
+            </div>
 
           </div>
 
@@ -362,47 +362,57 @@ export default function RevenueForecastPage() {
 
             <h2 className="font-semibold mb-2">Sales Inputs</h2>
 
-            {(
-
-              [
-
-                ["pipeline_value", "Pipeline Value"],
-
-                ["win_rate", "Win Rate (%)"],
-
-                ["sales_cycle_months", "Sales Cycle (Months)"],
-
-                ["acv", "ACV (Annual Contract Value)"],
-
-              ] as const
-
-            ).map(([key, label]) => (
-
-              <div key={key} className="flex justify-between mb-2">
-
-                <label>{label}</label>
-
-                <input
-
-                  type="number"
-
-                  step="any"
-
-                  value={(sales as any)[key]}
-
-                  onChange={(e) =>
-
-                    setSales({ ...sales, [key]: parseFloat(e.target.value) })
-
+            <div className="flex justify-between mb-2">
+              <label>Pipeline Value</label>
+              <input
+                type="number"
+                step="any"
+                value={sales.pipeline_value}
+                onChange={(e) =>
+                  setSales({ ...sales, pipeline_value: parseFloat(e.target.value) })
+                }
+                className="w-28 border rounded px-2"
+              />
+            </div>
+            <div className="flex justify-between mb-2">
+              <label>Win Rate (%)</label>
+              <input
+                type="number"
+                step="any"
+                value={sales.win_rate * 100}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (!isNaN(value)) {
+                    setSales({ ...sales, win_rate: value / 100 });
                   }
-
-                  className="w-28 border rounded px-2"
-
-                />
-
-              </div>
-
-            ))}
+                }}
+                className="w-28 border rounded px-2"
+              />
+            </div>
+            <div className="flex justify-between mb-2">
+              <label>Sales Cycle (Months)</label>
+              <input
+                type="number"
+                step="any"
+                value={sales.sales_cycle_months}
+                onChange={(e) =>
+                  setSales({ ...sales, sales_cycle_months: parseFloat(e.target.value) })
+                }
+                className="w-28 border rounded px-2"
+              />
+            </div>
+            <div className="flex justify-between mb-2">
+              <label>ACV (Annual Contract Value)</label>
+              <input
+                type="number"
+                step="any"
+                value={sales.acv}
+                onChange={(e) =>
+                  setSales({ ...sales, acv: parseFloat(e.target.value) })
+                }
+                className="w-28 border rounded px-2"
+              />
+            </div>
 
           </div>
 
@@ -418,49 +428,69 @@ export default function RevenueForecastPage() {
 
             <h2 className="font-semibold mb-2">Partner Inputs</h2>
 
-            {(
-
-              [
-
-                ["partners_active", "Active Partners (Starting)"],
-
-                ["new_partners_per_month", "New Partners per Month"],
-
-                ["avg_customers_per_partner", "Avg Customers per Partner"],
-
-                ["arpu", "ARPU (Monthly)"],
-
-                ["commission_rate", "Commission Rate (%)"],
-
-              ] as const
-
-            ).map(([key, label]) => (
-
-              <div key={key} className="flex justify-between mb-2">
-
-                <label>{label}</label>
-
-                <input
-
-                  type="number"
-
-                  step="any"
-
-                  value={(partners as any)[key]}
-
-                  onChange={(e) =>
-
-                    setPartners({ ...partners, [key]: parseFloat(e.target.value) })
-
+            <div className="flex justify-between mb-2">
+              <label>Active Partners (Starting)</label>
+              <input
+                type="number"
+                step="any"
+                value={partners.partners_active}
+                onChange={(e) =>
+                  setPartners({ ...partners, partners_active: parseFloat(e.target.value) })
+                }
+                className="w-28 border rounded px-2"
+              />
+            </div>
+            <div className="flex justify-between mb-2">
+              <label>New Partners per Month</label>
+              <input
+                type="number"
+                step="any"
+                value={partners.new_partners_per_month}
+                onChange={(e) =>
+                  setPartners({ ...partners, new_partners_per_month: parseFloat(e.target.value) })
+                }
+                className="w-28 border rounded px-2"
+              />
+            </div>
+            <div className="flex justify-between mb-2">
+              <label>Avg Customers per Partner</label>
+              <input
+                type="number"
+                step="any"
+                value={partners.avg_customers_per_partner}
+                onChange={(e) =>
+                  setPartners({ ...partners, avg_customers_per_partner: parseFloat(e.target.value) })
+                }
+                className="w-28 border rounded px-2"
+              />
+            </div>
+            <div className="flex justify-between mb-2">
+              <label>ARPU (Monthly)</label>
+              <input
+                type="number"
+                step="any"
+                value={partners.arpu}
+                onChange={(e) =>
+                  setPartners({ ...partners, arpu: parseFloat(e.target.value) })
+                }
+                className="w-28 border rounded px-2"
+              />
+            </div>
+            <div className="flex justify-between mb-2">
+              <label>Commission Rate (%)</label>
+              <input
+                type="number"
+                step="any"
+                value={partners.commission_rate * 100}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (!isNaN(value)) {
+                    setPartners({ ...partners, commission_rate: value / 100 });
                   }
-
-                  className="w-28 border rounded px-2"
-
-                />
-
-              </div>
-
-            ))}
+                }}
+                className="w-28 border rounded px-2"
+              />
+            </div>
 
           </div>
 
