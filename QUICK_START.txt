@@ -1,0 +1,53 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║     DATABASE CONNECTION - 3 STEPS TO SUCCESS                  ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+  STEP 1: Update Password
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  $ code .env
+  
+  Replace: YOUR_DB_PASSWORD
+  With: Your actual Supabase password
+  
+  Get it from: Supabase Dashboard → Settings → Database
+
+
+  STEP 2: Create Tables
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  $ npm run db:push
+
+
+  STEP 3: Verify
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  $ npm run db:studio
+
+
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║  ✅ THAT'S IT! Your database is ready to use! 🎉             ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+
+📚 Documentation:
+   → NEXT_STEPS.txt           (visual guide)
+   → DATABASE_QUICKSTART.md   (examples)
+   → SETUP_COMPLETE.md        (complete guide)
+
+
+🚀 What's Next:
+   → Add "Save to Cloud" button in your app
+   → Add "Load Scenarios" from database
+   → Add user authentication
+
+
+⚡ Quick Commands:
+   npm run dev         Start development server
+   npm run db:studio   Open database GUI
+   npm test            Run tests
+   npm run build       Production build
