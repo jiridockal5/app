@@ -33,7 +33,7 @@ _Last updated: 2024-12-19_
 
 ### Pages
 - ✅ `/plan` - Plan summary page with KPIs, charts, and table
-- ✅ `/wizard` - Setup wizard (10-12 inputs) with 3-step form
+- ✅ `/wizard` - **AI-Powered Budget Wizard** - Natural language budget generation using GPT-4
 - ✅ `/` - Financial dashboard with 10 KPIs
 - ✅ `/revenue` - Revenue forecast page
 - ✅ `/business` - SaaS Metrics dashboard
@@ -41,6 +41,11 @@ _Last updated: 2024-12-19_
 - ✅ Root page shows financial dashboard
 
 ### Features
+- ✅ **AI Budget Wizard** - Natural language budget generation with GPT-4
+  - Two-step flow: prompt → review generated assumptions
+  - Industry-standard SaaS benchmarks built into AI prompt
+  - Editable generated values before applying
+  - Clear reasoning for all assumptions
 - ✅ LocalStorage persistence for scenarios (automatic save/load)
 - ✅ CSV export of monthly table
 - ✅ Navigation between pages (sidebar with search)

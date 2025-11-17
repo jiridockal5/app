@@ -18,10 +18,13 @@
     "e2e:debug": "playwright test --debug"
   },
   "dependencies": {
+    "ai": "^5.0.93",
     "next": "16.0.0",
+    "openai": "^6.9.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "recharts": "^3.3.0",
+    "zod": "^4.1.12",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

@@ -2,6 +2,17 @@
 
 A non-finance-friendly budgeting tool for B2B SaaS companies. Turn plain-English inputs into a simple plan showing Revenue, Spend, Cash/Runway and KPIs.
 
+## ✨ New: AI Budget Wizard
+
+Simply describe your goals in natural language and let AI generate a realistic budget for you!
+
+**Example prompts:**
+- "We want to raise $1M to invest in GTM and product team"
+- "We have $500k ARR and want to double in 12 months with 5 engineers and 3 sales reps"
+- "Pre-revenue startup, need to hire 4 engineers, plan to close first customers in month 3"
+
+See [AI Wizard Setup Guide](docs/AI_WIZARD_SETUP.md) for configuration instructions.
+
 ## Tech Stack
 
 - Next.js 16 (App Router)
@@ -10,6 +21,7 @@ A non-finance-friendly budgeting tool for B2B SaaS companies. Turn plain-English
 - Zustand (state management)
 - Recharts (charts)
 - Vitest (testing)
+- OpenAI GPT-4 (AI Budget Wizard)
 
 ## Getting Started
 
@@ -18,14 +30,20 @@ A non-finance-friendly budgeting tool for B2B SaaS companies. Turn plain-English
 npm install
 ```
 
-2. Run the development server:
+2. Set up environment variables (for AI Wizard):
+```bash
+cp .env.example .env.local
+# Edit .env.local and add your OpenAI API key
+```
+
+3. Run the development server:
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-3. Run tests:
+4. Run tests:
 ```bash
 npm test
 ```
